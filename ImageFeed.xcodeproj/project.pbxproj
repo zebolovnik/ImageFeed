@@ -42,8 +42,8 @@
 		2E1B5D7C2E9CBB8D005B9EE8 /* ImagesList */ = {
 			isa = PBXGroup;
 			children = (
-				2E4E70782CA9163E001759B9 /* ImagesListViewController.swift */,
 				2E1B5D792E9CB8EA005B9EE8 /* ImagesListCell.swift */,
+				2E4E70782CA9163E001759B9 /* ImagesListViewController.swift */,
 			);
 			path = ImagesList;
 			sourceTree = "<group>";

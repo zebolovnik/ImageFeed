@@ -15,6 +15,12 @@ final class ImagesListCell: UITableViewCell {
     @IBOutlet weak var mainImageView: UIImageView!
     @IBOutlet weak var gradientView: UIView!
     
+    // Метод для включения/выключения лайка
+    func setIsLiked(_ isLiked: Bool) {
+        let imageName = isLiked ? "like_button_on" : "like_button_off" // имена картинок сердечка в ресурсах
+        likeButton.setImage(UIImage(named: imageName), for: .normal)
+    }
+    
     private let gradientLayer = CAGradientLayer()
 
     override func awakeFromNib() {
