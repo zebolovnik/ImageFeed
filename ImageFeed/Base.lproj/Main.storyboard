@@ -82,6 +82,7 @@
                                             <outlet property="gradientView" destination="k65-4b-HCH" id="aR6-IE-F4L"/>
                                             <outlet property="likeButton" destination="hEn-7p-3Ws" id="ZXS-9Q-BRK"/>
                                             <outlet property="mainImageView" destination="mb8-tt-uw2" id="WjQ-f1-NBa"/>
+                                            <segue destination="HeG-ta-0wG" kind="show" id="68Q-eM-tID"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -108,6 +109,36 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="753.43511450381675" y="138.73239436619718"/>
+        </scene>
+        <!--Single Image View Controller-->
+        <scene sceneID="JWT-IY-Q51">
+            <objects>
+                <viewController id="HeG-ta-0wG" customClass="SingleImageViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="kt9-h5-QBO">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="11" translatesAutoresizingMaskIntoConstraints="NO" id="tNp-1V-DTI">
+                                <rect key="frame" x="0.0" y="103" width="393" height="666"/>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="YB2-cg-uA3"/>
+                        <color key="backgroundColor" name="YP Black"/>
+                        <constraints>
+                            <constraint firstItem="YB2-cg-uA3" firstAttribute="trailing" secondItem="tNp-1V-DTI" secondAttribute="trailing" id="4F9-0J-0cd"/>
+                            <constraint firstItem="YB2-cg-uA3" firstAttribute="bottom" secondItem="tNp-1V-DTI" secondAttribute="bottom" id="d1H-sd-t4s"/>
+                            <constraint firstItem="tNp-1V-DTI" firstAttribute="top" secondItem="YB2-cg-uA3" secondAttribute="top" id="mNr-Ra-6QM"/>
+                            <constraint firstItem="tNp-1V-DTI" firstAttribute="leading" secondItem="YB2-cg-uA3" secondAttribute="leading" id="vwS-I6-rZH"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="RfM-ej-k1h"/>
+                    <connections>
+                        <outlet property="imageView" destination="tNp-1V-DTI" id="ZSt-bh-slF"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gzd-Qo-Xac" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1538" y="-95"/>
         </scene>
         <!--Profile-->
         <scene sceneID="lI9-mF-kE4">
@@ -241,6 +272,7 @@
     </scenes>
     <resources>
         <image name="0" width="1600" height="1059"/>
+        <image name="11" width="853" height="1280"/>
         <image name="avatar" width="70" height="70"/>
         <image name="like_button_on" width="42" height="42"/>
         <image name="logout_button" width="44" height="44"/>
