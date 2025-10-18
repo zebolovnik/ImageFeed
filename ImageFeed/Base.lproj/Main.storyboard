@@ -18,7 +18,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="0FQ-wQ-UNt">
-                                <rect key="frame" x="0.0" y="59" width="393" height="710"/>
+                                <rect key="frame" x="0.0" y="103" width="393" height="666"/>
                                 <color key="backgroundColor" name="YP Background"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ImagesListCell" rowHeight="284" id="L7t-pm-ETQ" customClass="ImagesListCell" customModule="ImageFeed" customModuleProvider="target">
@@ -30,6 +30,7 @@
                                             <subviews>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="mb8-tt-uw2">
                                                     <rect key="frame" x="16" y="4" width="361" height="276"/>
+                                                    <color key="backgroundColor" name="YP Black"/>
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
                                                             <integer key="value" value="16"/>
@@ -59,7 +60,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
-                                            <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <color key="backgroundColor" name="YP Black"/>
                                             <constraints>
                                                 <constraint firstItem="hEn-7p-3Ws" firstAttribute="top" secondItem="mb8-tt-uw2" secondAttribute="top" id="0QF-xM-BLe"/>
                                                 <constraint firstItem="mb8-tt-uw2" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jMu-mO-vN7" secondAttribute="trailing" constant="8" id="52n-f7-1ul"/>
@@ -75,7 +76,7 @@
                                                 <constraint firstItem="k65-4b-HCH" firstAttribute="leading" secondItem="4Hw-CF-KRb" secondAttribute="leading" id="wBt-FI-YKl"/>
                                             </constraints>
                                         </tableViewCellContentView>
-                                        <color key="backgroundColor" name="YP Background"/>
+                                        <color key="backgroundColor" name="YP Black"/>
                                         <connections>
                                             <outlet property="dateLabel" destination="jMu-mO-vN7" id="3RS-lJ-Kpo"/>
                                             <outlet property="gradientView" destination="k65-4b-HCH" id="aR6-IE-F4L"/>
@@ -99,32 +100,14 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="0FQ-wQ-UNt" secondAttribute="bottom" id="pCU-a0-XBi"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="" image="tab_editorial_active" id="84G-ZJ-1Kc"/>
+                    <navigationItem key="navigationItem" id="Nqs-yx-fqQ"/>
                     <connections>
                         <outlet property="tableView" destination="0FQ-wQ-UNt" id="2n8-bX-xlU"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-173" y="139"/>
-        </scene>
-        <!--Tab Bar Controller-->
-        <scene sceneID="BVZ-rK-1tg">
-            <objects>
-                <tabBarController id="zQ3-pA-ddo" sceneMemberID="viewController">
-                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="YWr-3a-0Jc">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    </tabBar>
-                    <connections>
-                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="viewControllers" id="Crr-VN-fa2"/>
-                        <segue destination="OgR-F9-7g7" kind="relationship" relationship="viewControllers" id="2r7-Kn-YPs"/>
-                    </connections>
-                </tabBarController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="StB-uO-tEW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-1286" y="-187"/>
+            <point key="canvasLocation" x="753.43511450381675" y="138.73239436619718"/>
         </scene>
         <!--Profile-->
         <scene sceneID="lI9-mF-kE4">
@@ -208,6 +191,52 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RUa-cF-MWf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-172" y="-615"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="BVZ-rK-1tg">
+            <objects>
+                <tabBarController id="zQ3-pA-ddo" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="YWr-3a-0Jc">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" name="YP Black"/>
+                        <color key="selectedImageTintColor" name="YP White"/>
+                        <tabBarAppearance key="standardAppearance">
+                            <color key="backgroundColor" name="YP Black"/>
+                        </tabBarAppearance>
+                    </tabBar>
+                    <connections>
+                        <segue destination="ywM-Im-XBA" kind="relationship" relationship="viewControllers" id="Crr-VN-fa2"/>
+                        <segue destination="OgR-F9-7g7" kind="relationship" relationship="viewControllers" id="2r7-Kn-YPs"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="StB-uO-tEW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1286" y="-187"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="TAh-o9-czv">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="ywM-Im-XBA" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="" image="tab_editorial_active" id="84G-ZJ-1Kc"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="LyH-Kb-xIj">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="tintColor" name="YP White"/>
+                        <color key="barTintColor" name="YP White"/>
+                        <navigationBarAppearance key="standardAppearance">
+                            <color key="backgroundColor" name="YP Black"/>
+                        </navigationBarAppearance>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="SS7-Gf-dZM"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="8Qk-gF-X3b" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-173.2824427480916" y="138.73239436619718"/>
         </scene>
     </scenes>
     <resources>
