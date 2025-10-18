@@ -103,7 +103,7 @@
                     <navigationItem key="navigationItem" id="Nqs-yx-fqQ"/>
                     <connections>
                         <outlet property="tableView" destination="0FQ-wQ-UNt" id="2n8-bX-xlU"/>
-                        <segue destination="HeG-ta-0wG" kind="show" identifier="ShowSingleImage" id="Rg0-le-oZk"/>
+                        <segue destination="HeG-ta-0wG" kind="presentation" identifier="ShowSingleImage" id="Rg0-le-oZk"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -113,22 +113,36 @@
         <!--Single Image View Controller-->
         <scene sceneID="JWT-IY-Q51">
             <objects>
-                <viewController id="HeG-ta-0wG" customClass="SingleImageViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="fullScreen" id="HeG-ta-0wG" customClass="SingleImageViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="kt9-h5-QBO">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="11" translatesAutoresizingMaskIntoConstraints="NO" id="tNp-1V-DTI">
-                                <rect key="frame" x="0.0" y="103" width="393" height="666"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="11" translatesAutoresizingMaskIntoConstraints="NO" id="tNp-1V-DTI">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UW3-PD-KW1">
+                                <rect key="frame" x="8" y="8" width="48" height="48"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="48" id="hG9-kb-xvC"/>
+                                    <constraint firstAttribute="width" constant="48" id="rb5-Bf-cYj"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="nav_back_button_white"/>
+                                <connections>
+                                    <action selector="didTapBackButton" destination="HeG-ta-0wG" eventType="touchUpInside" id="nfr-2T-RMS"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="YB2-cg-uA3"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
-                            <constraint firstItem="YB2-cg-uA3" firstAttribute="trailing" secondItem="tNp-1V-DTI" secondAttribute="trailing" id="4F9-0J-0cd"/>
-                            <constraint firstItem="YB2-cg-uA3" firstAttribute="bottom" secondItem="tNp-1V-DTI" secondAttribute="bottom" id="d1H-sd-t4s"/>
-                            <constraint firstItem="tNp-1V-DTI" firstAttribute="top" secondItem="YB2-cg-uA3" secondAttribute="top" id="mNr-Ra-6QM"/>
-                            <constraint firstItem="tNp-1V-DTI" firstAttribute="leading" secondItem="YB2-cg-uA3" secondAttribute="leading" id="vwS-I6-rZH"/>
+                            <constraint firstAttribute="trailing" secondItem="tNp-1V-DTI" secondAttribute="trailing" id="4F9-0J-0cd"/>
+                            <constraint firstItem="UW3-PD-KW1" firstAttribute="leading" secondItem="YB2-cg-uA3" secondAttribute="leading" constant="8" id="AlU-At-nTa"/>
+                            <constraint firstItem="UW3-PD-KW1" firstAttribute="top" secondItem="YB2-cg-uA3" secondAttribute="top" constant="8" id="FqY-XO-Y6Q"/>
+                            <constraint firstAttribute="bottom" secondItem="tNp-1V-DTI" secondAttribute="bottom" id="d1H-sd-t4s"/>
+                            <constraint firstItem="tNp-1V-DTI" firstAttribute="top" secondItem="kt9-h5-QBO" secondAttribute="top" id="mNr-Ra-6QM"/>
+                            <constraint firstItem="tNp-1V-DTI" firstAttribute="leading" secondItem="kt9-h5-QBO" secondAttribute="leading" id="vwS-I6-rZH"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="RfM-ej-k1h"/>
@@ -138,7 +152,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gzd-Qo-Xac" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1538" y="-95"/>
+            <point key="canvasLocation" x="1536.6412213740457" y="-95.070422535211279"/>
         </scene>
         <!--Profile-->
         <scene sceneID="lI9-mF-kE4">
@@ -276,6 +290,7 @@
         <image name="avatar" width="70" height="70"/>
         <image name="like_button_on" width="42" height="42"/>
         <image name="logout_button" width="44" height="44"/>
+        <image name="nav_back_button_white" width="24" height="24"/>
         <image name="tab_editorial_active" width="30" height="30"/>
         <image name="tab_profile_active" width="30" height="30"/>
         <namedColor name="YP Background">
