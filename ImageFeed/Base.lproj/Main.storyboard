@@ -28,7 +28,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="393" height="284"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="mb8-tt-uw2">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="mb8-tt-uw2" userLabel="Cell Image">
                                                     <rect key="frame" x="16" y="4" width="361" height="276"/>
                                                     <color key="backgroundColor" name="YP Black"/>
                                                     <userDefinedRuntimeAttributes>
@@ -78,11 +78,10 @@
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" name="YP Black"/>
                                         <connections>
+                                            <outlet property="cellImage" destination="mb8-tt-uw2" id="UNr-LC-reC"/>
                                             <outlet property="dateLabel" destination="jMu-mO-vN7" id="3RS-lJ-Kpo"/>
                                             <outlet property="gradientView" destination="k65-4b-HCH" id="aR6-IE-F4L"/>
                                             <outlet property="likeButton" destination="hEn-7p-3Ws" id="ZXS-9Q-BRK"/>
-                                            <outlet property="mainImageView" destination="mb8-tt-uw2" id="WjQ-f1-NBa"/>
-                                            <segue destination="HeG-ta-0wG" kind="show" id="68Q-eM-tID"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -104,6 +103,7 @@
                     <navigationItem key="navigationItem" id="Nqs-yx-fqQ"/>
                     <connections>
                         <outlet property="tableView" destination="0FQ-wQ-UNt" id="2n8-bX-xlU"/>
+                        <segue destination="HeG-ta-0wG" kind="show" identifier="ShowSingleImage" id="Rg0-le-oZk"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
