@@ -37,6 +37,15 @@ final class SingleImageViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
+    @IBAction func didTapShareButton(_ sender: UIButton) {
+        guard let image else { return }
+        let share = UIActivityViewController(
+            activityItems: [image],
+            applicationActivities: nil
+        )
+        present(share, animated: true, completion: nil)
+    }
+    
     // --- НОВОЕ: вспомогательная функция для выставления размера imageView и contentSize ---
     private func updateImageViewFrame() {
         guard isViewLoaded, let image = imageView.image else { return }
@@ -73,4 +82,23 @@ extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         imageView
     }
+    
+    // --- НОВОЕ: центрирование после жестов зума ---
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            guard let imageView = scrollView.subviews.first as? UIImageView else { return }
+            
+            let imageViewSize = imageView.frame.size
+            let scrollViewSize = scrollView.bounds.size
+            
+            let verticalInset = max(0, (scrollViewSize.height - imageViewSize.height) / 2)
+            let horizontalInset = max(0, (scrollViewSize.width - imageViewSize.width) / 2)
+            
+            scrollView.contentInset = UIEdgeInsets(
+                top: verticalInset,
+                left: horizontalInset,
+                bottom: verticalInset,
+                right: horizontalInset
+            )
+        }
+    
 }

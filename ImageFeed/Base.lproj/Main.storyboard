@@ -145,16 +145,30 @@
                                     <action selector="didTapBackButton" destination="HeG-ta-0wG" eventType="touchUpInside" id="nfr-2T-RMS"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Aqw-OB-kff">
+                                <rect key="frame" x="171.66666666666666" y="785" width="50" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="2k2-qw-GL5"/>
+                                    <constraint firstAttribute="height" constant="50" id="6bF-LJ-xrX"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="share_button"/>
+                                <connections>
+                                    <action selector="didTapShareButton:" destination="HeG-ta-0wG" eventType="touchUpInside" id="5VM-zH-Mjk"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="YB2-cg-uA3"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
+                            <constraint firstItem="Aqw-OB-kff" firstAttribute="centerX" secondItem="YB2-cg-uA3" secondAttribute="centerX" id="9Aa-4s-GzQ"/>
                             <constraint firstItem="tAV-yD-T2p" firstAttribute="bottom" secondItem="YB2-cg-uA3" secondAttribute="bottom" id="AL4-RQ-le0"/>
                             <constraint firstItem="tAV-yD-T2p" firstAttribute="trailing" secondItem="YB2-cg-uA3" secondAttribute="trailing" id="AkM-Hc-x3P"/>
                             <constraint firstItem="UW3-PD-KW1" firstAttribute="leading" secondItem="YB2-cg-uA3" secondAttribute="leading" constant="8" id="AlU-At-nTa"/>
                             <constraint firstItem="UW3-PD-KW1" firstAttribute="top" secondItem="YB2-cg-uA3" secondAttribute="top" constant="8" id="FqY-XO-Y6Q"/>
                             <constraint firstItem="tAV-yD-T2p" firstAttribute="top" secondItem="YB2-cg-uA3" secondAttribute="top" id="bFc-8f-JbM"/>
                             <constraint firstItem="tAV-yD-T2p" firstAttribute="leading" secondItem="YB2-cg-uA3" secondAttribute="leading" id="cGF-TJ-DPb"/>
+                            <constraint firstItem="YB2-cg-uA3" firstAttribute="bottom" secondItem="Aqw-OB-kff" secondAttribute="bottom" constant="17" id="kiT-mb-k3P"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="RfM-ej-k1h"/>
@@ -280,6 +294,7 @@
         <image name="like_button_on" width="42" height="42"/>
         <image name="logout_button" width="44" height="44"/>
         <image name="nav_back_button_white" width="24" height="24"/>
+        <image name="share_button" width="50" height="50"/>
         <image name="tab_editorial_active" width="30" height="30"/>
         <image name="tab_profile_active" width="30" height="30"/>
         <namedColor name="YP Background">
