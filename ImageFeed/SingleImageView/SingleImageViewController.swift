@@ -30,9 +30,9 @@ final class SingleImageViewController: UIViewController {
         imageView.image = image
         imageView.frame.size = image.size
         rescaleAndCenterImageInScrollView(image: image)
-
+        
     }
-
+    
     @IBAction private func didTapBackButton() {
         dismiss(animated: true, completion: nil)
     }
@@ -46,14 +46,10 @@ final class SingleImageViewController: UIViewController {
         present(share, animated: true, completion: nil)
     }
     
-    // --- НОВОЕ: вспомогательная функция для выставления размера imageView и contentSize ---
     private func updateImageViewFrame() {
         guard isViewLoaded, let image = imageView.image else { return }
         
-        // разрешаем imageView работать через frame (не через Auto Layout)
         imageView.translatesAutoresizingMaskIntoConstraints = true
-        
-        // размер imageView = размер картинки
         imageView.frame.size = image.size
         scrollView.contentSize = image.size
     }
@@ -77,28 +73,26 @@ final class SingleImageViewController: UIViewController {
     
 }
 
-// --- НОВОЕ: UIScrollViewDelegate для зума ---
 extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         imageView
     }
     
-    // --- НОВОЕ: центрирование после жестов зума ---
-        func scrollViewDidZoom(_ scrollView: UIScrollView) {
-            guard let imageView = scrollView.subviews.first as? UIImageView else { return }
-            
-            let imageViewSize = imageView.frame.size
-            let scrollViewSize = scrollView.bounds.size
-            
-            let verticalInset = max(0, (scrollViewSize.height - imageViewSize.height) / 2)
-            let horizontalInset = max(0, (scrollViewSize.width - imageViewSize.width) / 2)
-            
-            scrollView.contentInset = UIEdgeInsets(
-                top: verticalInset,
-                left: horizontalInset,
-                bottom: verticalInset,
-                right: horizontalInset
-            )
-        }
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        guard let imageView = scrollView.subviews.first as? UIImageView else { return }
+        
+        let imageViewSize = imageView.frame.size
+        let scrollViewSize = scrollView.bounds.size
+        
+        let verticalInset = max(0, (scrollViewSize.height - imageViewSize.height) / 2)
+        let horizontalInset = max(0, (scrollViewSize.width - imageViewSize.width) / 2)
+        
+        scrollView.contentInset = UIEdgeInsets(
+            top: verticalInset,
+            left: horizontalInset,
+            bottom: verticalInset,
+            right: horizontalInset
+        )
+    }
     
 }

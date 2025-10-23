@@ -33,7 +33,7 @@ final class ImagesListCell: UITableViewCell {
         gradientLayer.endPoint = CGPoint(x: 0.5, y: 1)
         gradientView.layer.insertSublayer(gradientLayer, at: 0)
     }
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         gradientLayer.frame = gradientView.bounds
