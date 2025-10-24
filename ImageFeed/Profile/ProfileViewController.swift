@@ -9,6 +9,23 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
+    // MARK: - Constants
+    private enum Constants {
+        static let avatarSize: CGFloat = 70
+        static let avatarCornerRadius: CGFloat = 35
+        static let avatarLeading: CGFloat = 16
+        static let avatarTop: CGFloat = 32
+        
+        static let nameTopOffset: CGFloat = 8
+        static let loginTopOffset: CGFloat = 8
+        static let descriptionTopOffset: CGFloat = 8
+        static let logoutTrailing: CGFloat = -16
+
+        static let nameText = "Екатерина Новикова"
+        static let loginText = "@ekaterina_nov"
+        static let descriptionText = "Hello, world!"
+    }
+    
     // MARK: - UI элементы
     private let avatarImageView = UIImageView()
     private let nameLabel = UILabel()
@@ -33,33 +50,33 @@ private extension ProfileViewController {
     func setupAvatarImageView() {
         avatarImageView.image = UIImage(named: "avatar")
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
-        avatarImageView.layer.cornerRadius = 35
+        avatarImageView.layer.cornerRadius = Constants.avatarCornerRadius
         avatarImageView.clipsToBounds = true
         view.addSubview(avatarImageView)
         
         NSLayoutConstraint.activate([
-            avatarImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            avatarImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
-            avatarImageView.widthAnchor.constraint(equalToConstant: 70),
-            avatarImageView.heightAnchor.constraint(equalToConstant: 70)
+            avatarImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Constants.avatarLeading),
+            avatarImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.avatarTop),
+            avatarImageView.widthAnchor.constraint(equalToConstant: Constants.avatarSize),
+            avatarImageView.heightAnchor.constraint(equalToConstant: Constants.avatarSize)
         ])
     }
     
-    func setupLabels() {
+    private func setupLabels() {
         // Имя
-        nameLabel.text = "Екатерина Новикова"
+        nameLabel.text = Constants.nameText
         nameLabel.textColor = UIColor(named: "YP White")
         nameLabel.font = UIFont.boldSystemFont(ofSize: 23)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         
         // Логин
-        loginNameLabel.text = "@ekaterina_nov"
+        loginNameLabel.text = Constants.loginText
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13)
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
         // Описание
-        descriptionLabel.text = "Hello, world!"
+        descriptionLabel.text = Constants.descriptionText
         descriptionLabel.textColor = UIColor(named: "YP White")
         descriptionLabel.font = UIFont.systemFont(ofSize: 13)
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -67,13 +84,13 @@ private extension ProfileViewController {
         [nameLabel, loginNameLabel, descriptionLabel].forEach { view.addSubview($0) }
         
         NSLayoutConstraint.activate([
-            nameLabel.topAnchor.constraint(equalTo: avatarImageView.bottomAnchor, constant: 8),
+            nameLabel.topAnchor.constraint(equalTo: avatarImageView.bottomAnchor, constant: Constants.nameTopOffset),
             nameLabel.leadingAnchor.constraint(equalTo: avatarImageView.leadingAnchor),
             
-            loginNameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
+            loginNameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: Constants.loginTopOffset),
             loginNameLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
             
-            descriptionLabel.topAnchor.constraint(equalTo: loginNameLabel.bottomAnchor, constant: 8),
+            descriptionLabel.topAnchor.constraint(equalTo: loginNameLabel.bottomAnchor, constant: Constants.descriptionTopOffset),
             descriptionLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor)
         ])
     }
@@ -87,7 +104,7 @@ private extension ProfileViewController {
         
         NSLayoutConstraint.activate([
             logoutButton.centerYAnchor.constraint(equalTo: avatarImageView.centerYAnchor),
-            logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16)
+            logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: Constants.logoutTrailing)
         ])
     }
 }
