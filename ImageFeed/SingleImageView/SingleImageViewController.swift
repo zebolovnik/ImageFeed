@@ -23,8 +23,8 @@ final class SingleImageViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        scrollView.minimumZoomScale = 0.1
-        scrollView.maximumZoomScale = 1.25
+        scrollView.minimumZoomScale = 1.0
+        scrollView.maximumZoomScale = 3.0
         
         guard let image else { return }
         imageView.image = image
@@ -61,9 +61,9 @@ final class SingleImageViewController: UIViewController {
         let visibleRectSize = scrollView.bounds.size
         let imageSize = image.size
         
-        // 🛡 Проверка деления на ноль
+
         guard imageSize.width > 0, imageSize.height > 0 else {
-            print("⚠️ Image has invalid size: \(imageSize)")
+            print("Image has invalid size: \(imageSize)")
             return
         }
         
