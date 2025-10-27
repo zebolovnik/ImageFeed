@@ -18,19 +18,32 @@ final class SingleImageViewController: UIViewController {
         }
     }
     
-    @IBOutlet var scrollView: UIScrollView!
+    @IBOutlet private var scrollView: UIScrollView!
     @IBOutlet private var imageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        scrollView.minimumZoomScale = 1.0
+        
+        // Отключаем влияние safe area на scrollView
+        scrollView.contentInsetAdjustmentBehavior = .never
+        
+        scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 3.0
         
-        guard let image else { return }
-        imageView.image = image
-        imageView.frame.size = image.size
-        rescaleAndCenterImageInScrollView(image: image)
+        if let image {
+            imageView.image = image
+            imageView.frame.size = image.size
+            rescaleAndCenterImageInScrollView(image: image)
+        }
         
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // Повторное центрирование после окончательной верстки
+        if let image = imageView.image {
+            rescaleAndCenterImageInScrollView(image: image)
+        }
     }
     
     @IBAction private func didTapBackButton() {
@@ -46,33 +59,28 @@ final class SingleImageViewController: UIViewController {
         present(share, animated: true, completion: nil)
     }
     
-    private func updateImageViewFrame() {
-        guard isViewLoaded, let image = imageView.image else { return }
-        
-        imageView.translatesAutoresizingMaskIntoConstraints = true
-        imageView.frame.size = image.size
-        scrollView.contentSize = image.size
-    }
-    
     private func rescaleAndCenterImageInScrollView(image: UIImage) {
         let minZoomScale = scrollView.minimumZoomScale
         let maxZoomScale = scrollView.maximumZoomScale
+        
         view.layoutIfNeeded()
+        
         let visibleRectSize = scrollView.bounds.size
         let imageSize = image.size
         
-
         guard imageSize.width > 0, imageSize.height > 0 else {
             print("Image has invalid size: \(imageSize)")
             return
         }
         
+        // Масштабируем, чтобы изображение заполняло экран (а не умещалось)
         let hScale = visibleRectSize.width / imageSize.width
         let vScale = visibleRectSize.height / imageSize.height
-        let scale = min(maxZoomScale, max(minZoomScale, min(hScale, vScale)))
+        let scale = min(maxZoomScale, max(minZoomScale, max(hScale, vScale)))
         scrollView.setZoomScale(scale, animated: false)
         scrollView.layoutIfNeeded()
         
+        // Центрируем картинку по горизонтали и вертикали
         let newContentSize = scrollView.contentSize
         let x = max(0, (newContentSize.width - visibleRectSize.width) / 2)
         let y = max(0, (newContentSize.height - visibleRectSize.height) / 2)
@@ -92,6 +100,7 @@ extension SingleImageViewController: UIScrollViewDelegate {
         let imageViewSize = imageView.frame.size
         let scrollViewSize = scrollView.bounds.size
         
+        // Центрируем картинку при зуме
         let verticalInset = max(0, (scrollViewSize.height - imageViewSize.height) / 2)
         let horizontalInset = max(0, (scrollViewSize.width - imageViewSize.width) / 2)
         
