@@ -22,7 +22,7 @@ extension URLSession {
                 completion(result)
             }
         }
-
+        
         let task = dataTask(with: request) { data, response, error in
             if let data = data, let httpResponse = response as? HTTPURLResponse {
                 if 200 ..< 300 ~= httpResponse.statusCode {
@@ -39,7 +39,7 @@ extension URLSession {
                 fulfillCompletionOnMain(.failure(NetworkError.urlSessionError))
             }
         }
-
+        
         return task
     }
 }

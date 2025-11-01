@@ -93,7 +93,7 @@
                             </tableView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" name="YP Background"/>
+                        <color key="backgroundColor" name="YP Black"/>
                         <constraints>
                             <constraint firstItem="0FQ-wQ-UNt" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="1fG-1k-rld"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="0FQ-wQ-UNt" secondAttribute="trailing" id="DtY-fs-Tlp"/>
@@ -198,14 +198,16 @@
         <!--Tab Bar Controller-->
         <scene sceneID="BVZ-rK-1tg">
             <objects>
-                <tabBarController id="zQ3-pA-ddo" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="TabBarViewController" id="zQ3-pA-ddo" sceneMemberID="viewController">
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="YWr-3a-0Jc">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" name="YP Black"/>
+                        <color key="barTintColor" name="YP Black"/>
                         <color key="selectedImageTintColor" name="YP White"/>
                         <tabBarAppearance key="standardAppearance">
                             <color key="backgroundColor" name="YP Black"/>
+                            <color key="shadowColor" name="YP Black"/>
                         </tabBarAppearance>
                     </tabBar>
                     <connections>
@@ -334,7 +336,7 @@
         <!--Splash View Controller-->
         <scene sceneID="pCI-Bm-eqo">
             <objects>
-                <viewController id="a1U-V9-FA6" customClass="SplashViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SplashViewController" id="a1U-V9-FA6" customClass="SplashViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Mbo-aF-TfT">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

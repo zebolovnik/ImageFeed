@@ -15,15 +15,15 @@ protocol AuthViewControllerDelegate: AnyObject {
 // MARK: - AuthViewController
 final class AuthViewController: UIViewController {
     private let showWebViewSegueIdentifier = "ShowWebView"
-    private let oauth2Service = OAuth2Service.shared // добавили сервис
-
-    weak var delegate: AuthViewControllerDelegate? // делегат для SplashViewController
-
+    private let oauth2Service = OAuth2Service.shared
+    
+    weak var delegate: AuthViewControllerDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureBackButton()
     }
-
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showWebViewSegueIdentifier {
             guard
@@ -37,7 +37,7 @@ final class AuthViewController: UIViewController {
             super.prepare(for: segue, sender: sender)
         }
     }
-
+    
     private func configureBackButton() {
         navigationController?.navigationBar.backIndicatorImage = UIImage(named: "nav_back_button")
         navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(named: "nav_back_button")
@@ -74,7 +74,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
             }
         }
     }
-
+    
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         vc.dismiss(animated: true)
     }
