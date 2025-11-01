@@ -285,6 +285,10 @@
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="NRi-od-vtm">
+                                <rect key="frame" x="0.0" y="172" width="393" height="4"/>
+                                <color key="progressTintColor" name="YP Black"/>
+                            </progressView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Go3-O2-iHH"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -293,10 +297,14 @@
                             <constraint firstItem="ca8-aI-zIm" firstAttribute="leading" secondItem="RhN-vO-yyE" secondAttribute="leading" id="AKd-BH-uDP"/>
                             <constraint firstAttribute="trailing" secondItem="ca8-aI-zIm" secondAttribute="trailing" id="Fci-Eu-UGm"/>
                             <constraint firstAttribute="bottom" secondItem="ca8-aI-zIm" secondAttribute="bottom" id="VFS-Qt-Rlw"/>
+                            <constraint firstItem="NRi-od-vtm" firstAttribute="top" secondItem="Go3-O2-iHH" secondAttribute="top" id="ie1-19-kZl"/>
+                            <constraint firstItem="NRi-od-vtm" firstAttribute="leading" secondItem="Go3-O2-iHH" secondAttribute="leading" id="nCA-af-EMJ"/>
+                            <constraint firstItem="Go3-O2-iHH" firstAttribute="trailing" secondItem="NRi-od-vtm" secondAttribute="trailing" id="wLC-3L-9Mi"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Yvh-jD-i65"/>
                     <connections>
+                        <outlet property="progressView" destination="NRi-od-vtm" id="XFK-ll-hn0"/>
                         <outlet property="webView" destination="ca8-aI-zIm" id="6ux-eH-FKa"/>
                     </connections>
                 </viewController>
@@ -307,7 +315,6 @@
         <!--Navigation Controller-->
         <scene sceneID="vZ8-Pb-ksi">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Bqo-da-zEV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="M2p-mp-l4q" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="oDN-LI-wzM">
@@ -319,6 +326,7 @@
                         <segue destination="Fd7-Cq-hkP" kind="relationship" relationship="rootViewController" id="YKv-jZ-XkS"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Bqo-da-zEV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-2450" y="-1004"/>
         </scene>
