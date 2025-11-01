@@ -7,14 +7,23 @@
 
 import UIKit
 
+// MARK: - AuthViewControllerDelegate
+protocol AuthViewControllerDelegate: AnyObject {
+    func didAuthenticate(_ vc: AuthViewController)
+}
+
+// MARK: - AuthViewController
 final class AuthViewController: UIViewController {
     private let showWebViewSegueIdentifier = "ShowWebView"
+    private let oauth2Service = OAuth2Service.shared // добавили сервис
+
+    weak var delegate: AuthViewControllerDelegate? // делегат для SplashViewController
 
     override func viewDidLoad() {
         super.viewDidLoad()
         configureBackButton()
     }
-    
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showWebViewSegueIdentifier {
             guard
@@ -28,7 +37,7 @@ final class AuthViewController: UIViewController {
             super.prepare(for: segue, sender: sender)
         }
     }
-    
+
     private func configureBackButton() {
         navigationController?.navigationBar.backIndicatorImage = UIImage(named: "nav_back_button")
         navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(named: "nav_back_button")
@@ -37,12 +46,45 @@ final class AuthViewController: UIViewController {
     }
 }
 
+// MARK: - WebViewViewControllerDelegate
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        //TODO: process code
+        vc.dismiss(animated: true)
+        
+        fetchOAuthToken(code) { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let token):
+                print("Получен токен: \(token)")
+                DispatchQueue.main.async {
+                    self.delegate?.didAuthenticate(self)
+                }
+            case .failure(let error):
+                print("Ошибка авторизации:", error.localizedDescription)
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(
+                        title: "Ошибка",
+                        message: error.localizedDescription,
+                        preferredStyle: .alert
+                    )
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
+                }
+            }
+        }
     }
 
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         vc.dismiss(animated: true)
+    }
+}
+
+// MARK: - OAuth2 Token Fetch
+extension AuthViewController {
+    private func fetchOAuthToken(_ code: String, completion: @escaping (Result<String, Error>) -> Void) {
+        oauth2Service.fetchAuthToken(code: code) { result in
+            completion(result)
+        }
     }
 }
