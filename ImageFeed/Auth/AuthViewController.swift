@@ -49,8 +49,7 @@ final class AuthViewController: UIViewController {
 // MARK: - WebViewViewControllerDelegate
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        vc.dismiss(animated: true)
-        
+        // УБЕРИТЕ отсюда dismiss - он закрывает WebView слишком рано
         fetchOAuthToken(code) { [weak self] result in
             guard let self = self else { return }
             
@@ -58,7 +57,10 @@ extension AuthViewController: WebViewViewControllerDelegate {
             case .success(let token):
                 print("Получен токен: \(token)")
                 DispatchQueue.main.async {
+                    // Сначала сообщаем делегату об успешной авторизации
                     self.delegate?.didAuthenticate(self)
+                    // Затем закрываем WebView
+                    vc.dismiss(animated: true)
                 }
             case .failure(let error):
                 print("Ошибка авторизации:", error.localizedDescription)
@@ -69,7 +71,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
                         preferredStyle: .alert
                     )
                     alert.addAction(UIAlertAction(title: "OK", style: .default))
-                    self.present(alert, animated: true)
+                    vc.present(alert, animated: true)
                 }
             }
         }
