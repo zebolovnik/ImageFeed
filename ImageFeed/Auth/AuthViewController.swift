@@ -5,6 +5,7 @@
 //  Created by Nikolay Zebolov on 01.11.2025.
 //
 
+import ProgressHUD
 import UIKit
 
 // MARK: - AuthViewControllerDelegate
@@ -49,8 +50,16 @@ final class AuthViewController: UIViewController {
 // MARK: - WebViewViewControllerDelegate
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        // УБЕРИТЕ отсюда dismiss - он закрывает WebView слишком рано
+        // Скрываем WebViewViewController
+                vc.dismiss(animated: true)
+        
+        // Показываем индикатор загрузки
+                ProgressHUD.animate()
+        
         fetchOAuthToken(code) { [weak self] result in
+        // Скрываем индикатор загрузки
+                ProgressHUD.dismiss()
+            
             guard let self = self else { return }
             
             switch result {
@@ -59,8 +68,6 @@ extension AuthViewController: WebViewViewControllerDelegate {
                 DispatchQueue.main.async {
                     // Сначала сообщаем делегату об успешной авторизации
                     self.delegate?.didAuthenticate(self)
-                    // Затем закрываем WebView
-                    vc.dismiss(animated: true)
                 }
             case .failure(let error):
                 print("Ошибка авторизации:", error.localizedDescription)
@@ -71,7 +78,8 @@ extension AuthViewController: WebViewViewControllerDelegate {
                         preferredStyle: .alert
                     )
                     alert.addAction(UIAlertAction(title: "OK", style: .default))
-                    vc.present(alert, animated: true)
+                    // Показываем alert на текущем view controller
+                    self.present(alert, animated: true)
                 }
             }
         }
