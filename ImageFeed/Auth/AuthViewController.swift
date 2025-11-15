@@ -51,14 +51,14 @@ final class AuthViewController: UIViewController {
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         // Скрываем WebViewViewController
-                vc.dismiss(animated: true)
+        vc.dismiss(animated: true)
         
-        // Показываем индикатор загрузки
-                ProgressHUD.animate()
+        // CHANGE: заменён ProgressHUD на UIBlockingProgressHUD
+        UIBlockingProgressHUD.show()
         
         fetchOAuthToken(code) { [weak self] result in
-        // Скрываем индикатор загрузки
-                ProgressHUD.dismiss()
+            // CHANGE: заменён ProgressHUD на UIBlockingProgressHUD
+            UIBlockingProgressHUD.dismiss()
             
             guard let self = self else { return }
             
