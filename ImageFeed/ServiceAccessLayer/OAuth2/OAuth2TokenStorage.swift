@@ -8,6 +8,10 @@
 import Foundation
 
 final class OAuth2TokenStorage {
+    // ADDED: синглтон
+    static let shared = OAuth2TokenStorage()
+    private init() {}
+    
     private let key = "BearerToken"
     
     var token: String? {
