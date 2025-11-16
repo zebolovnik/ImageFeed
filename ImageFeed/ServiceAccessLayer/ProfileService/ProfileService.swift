@@ -29,12 +29,13 @@ struct ProfileResult: Codable {
 }
 
 final class ProfileService {
-    // ADDED: singleton pattern
     static let shared = ProfileService()
     private init() {}
     
     private var task: URLSessionTask?
     private let urlSession = URLSession.shared
+    // ADDED: свойство для хранения профиля
+    private(set) var profile: Profile?
 
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         task?.cancel()
@@ -56,6 +57,8 @@ final class ProfileService {
                         loginName: "@\(profileResult.username)",
                         bio: profileResult.bio
                     )
+                    // ADDED: сохранение профиля
+                    self?.profile = profile
                     completion(.success(profile))
                 } catch {
                     completion(.failure(error))
@@ -81,4 +84,3 @@ final class ProfileService {
         return request
     }
 }
-

@@ -11,12 +11,15 @@ final class SplashViewController: UIViewController {
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     
     private let storage = OAuth2TokenStorage()
+    // ADDED: сервис профиля
+    private let profileService = ProfileService.shared
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if storage.token != nil {
-            switchToTabBarController()
+        if let token = storage.token {
+            // CHANGE: загрузка профиля при наличии токена
+            fetchProfile(token: token)
         } else {
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
@@ -41,6 +44,23 @@ final class SplashViewController: UIViewController {
             .instantiateViewController(withIdentifier: "TabBarViewController")
         window.rootViewController = tabBarController
     }
+    
+    // ADDED: метод загрузки профиля
+    private func fetchProfile(token: String) {
+        UIBlockingProgressHUD.show()
+        profileService.fetchProfile(token) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            
+            guard let self = self else { return }
+            
+            switch result {
+            case .success:
+                self.switchToTabBarController()
+            case .failure(let error):
+                print("Ошибка загрузки профиля:", error)
+            }
+        }
+    }
 }
 
 extension SplashViewController {
@@ -62,12 +82,10 @@ extension SplashViewController {
 
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
-        print("didAuthenticate called - switching to tab bar")
-        // Закрываем AuthViewController
-        vc.dismiss(animated: true) { [weak self] in
-            // После закрытия переключаемся на главный экран
-            self?.switchToTabBarController()
-        }
+        vc.dismiss(animated: true)
+        
+        guard let token = storage.token else { return }
+        // ADDED: загрузка профиля после авторизации
+        fetchProfile(token: token)
     }
 }
-
