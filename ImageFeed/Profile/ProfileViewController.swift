@@ -21,9 +21,9 @@ final class ProfileViewController: UIViewController {
         static let descriptionTopOffset: CGFloat = 8
         static let logoutTrailing: CGFloat = -16
 
-        static let nameText = "Екатерина Новикова"
-        static let loginText = "@ekaterina_nov"
-        static let descriptionText = "Hello, world!"
+//        static let nameText = "Екатерина Новикова"
+//        static let loginText = "@ekaterina_nov"
+//        static let descriptionText = "Hello, world!"
     }
     
     // MARK: - UI элементы
@@ -33,6 +33,10 @@ final class ProfileViewController: UIViewController {
     private let descriptionLabel = UILabel()
     private let logoutButton = UIButton()
     
+    // ADDED: сервис для загрузки профиля
+    private let profileService = ProfileService.shared
+    private let tokenStorage = OAuth2TokenStorage()
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,6 +45,9 @@ final class ProfileViewController: UIViewController {
         setupAvatarImageView()
         setupLabels()
         setupLogoutButton()
+        
+        // ADDED: загрузка данных профиля
+        fetchProfile()
     }
 }
 
@@ -64,22 +71,23 @@ private extension ProfileViewController {
     
     private func setupLabels() {
         // Имя
-        nameLabel.text = Constants.nameText
+        nameLabel.text = "" // CHANGE: будет установлено из API
         nameLabel.textColor = UIColor(named: "YP White")
         nameLabel.font = UIFont.boldSystemFont(ofSize: 23)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         
         // Логин
-        loginNameLabel.text = Constants.loginText
+        loginNameLabel.text = "" // CHANGE: будет установлено из API
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13)
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
         // Описание
-        descriptionLabel.text = Constants.descriptionText
+        descriptionLabel.text = "" // CHANGE: будет установлено из API
         descriptionLabel.textColor = UIColor(named: "YP White")
         descriptionLabel.font = UIFont.systemFont(ofSize: 13)
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        descriptionLabel.numberOfLines = 0
         
         [nameLabel, loginNameLabel, descriptionLabel].forEach { view.addSubview($0) }
         
@@ -107,6 +115,33 @@ private extension ProfileViewController {
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: Constants.logoutTrailing)
         ])
     }
+    
+    // ADDED: загрузка данных профиля
+        func fetchProfile() {
+            guard let token = tokenStorage.token else {
+                print("No token available")
+                return
+            }
+            
+            profileService.fetchProfile(token) { [weak self] result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let profile):
+                        self?.updateUI(with: profile)
+                    case .failure(let error):
+                        print("Failed to fetch profile:", error.localizedDescription)
+                    }
+                }
+            }
+        }
+        
+        // ADDED: обновление UI с данными профиля
+        func updateUI(with profile: Profile) {
+            nameLabel.text = profile.name
+            loginNameLabel.text = profile.loginName
+            descriptionLabel.text = profile.bio
+        }
+    
 }
 
 // MARK: - Actions
