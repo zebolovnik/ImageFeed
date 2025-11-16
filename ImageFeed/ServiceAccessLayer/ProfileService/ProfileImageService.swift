@@ -31,7 +31,6 @@ final class ProfileImageService {
     static let shared = ProfileImageService()
     private init() {}
 
-    // ADDED: нотификация для обновления аватарки
     static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
 
     private(set) var avatarURL: String?
@@ -51,29 +50,23 @@ final class ProfileImageService {
             return
         }
 
-        let task = URLSession.shared.data(for: request) { [weak self] result in
+        // CHANGE: использование objectTask вместо data
+        let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
             switch result {
-            case .success(let data):
+            case .success(let userResult):
                 guard let self else { return }
 
-                do {
-                    let userResult = try JSONDecoder().decode(UserResult.self, from: data)
-
-                    self.avatarURL = userResult.profileImage.small
-                    completion(.success(userResult.profileImage.small))
-                    
-                    // ADDED: отправка нотификации с URL аватарки
-                    NotificationCenter.default
-                        .post(
-                            name: ProfileImageService.didChangeNotification,
-                            object: self,
-                            userInfo: ["URL": userResult.profileImage.small])
-                } catch {
-                    print(error)
-                }
-
+                self.avatarURL = userResult.profileImage.small
+                completion(.success(userResult.profileImage.small))
+                
+                NotificationCenter.default
+                    .post(
+                        name: ProfileImageService.didChangeNotification,
+                        object: self,
+                        userInfo: ["URL": userResult.profileImage.small])
             case .failure(let error):
-                print("[fetchProfileImageURL]: Ошибка запроса: \(error.localizedDescription)")
+                // ADDED: логирование ошибок
+                print("[fetchProfileImageURL]: Ошибка - \(error.localizedDescription)")
                 completion(.failure(error))
             }
         }

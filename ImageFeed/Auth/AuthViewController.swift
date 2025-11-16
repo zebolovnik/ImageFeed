@@ -5,7 +5,6 @@
 //  Created by Nikolay Zebolov on 01.11.2025.
 //
 
-import ProgressHUD
 import UIKit
 
 // MARK: - AuthViewControllerDelegate
@@ -53,11 +52,9 @@ extension AuthViewController: WebViewViewControllerDelegate {
         // Скрываем WebViewViewController
         vc.dismiss(animated: true)
         
-        // CHANGE: заменён ProgressHUD на UIBlockingProgressHUD
         UIBlockingProgressHUD.show()
         
         fetchOAuthToken(code) { [weak self] result in
-            // CHANGE: заменён ProgressHUD на UIBlockingProgressHUD
             UIBlockingProgressHUD.dismiss()
             
             guard let self = self else { return }
@@ -66,20 +63,13 @@ extension AuthViewController: WebViewViewControllerDelegate {
             case .success(let token):
                 print("Получен токен: \(token)")
                 DispatchQueue.main.async {
-                    // Сначала сообщаем делегату об успешной авторизации
                     self.delegate?.didAuthenticate(self)
                 }
             case .failure(let error):
+                // CHANGE: унифицированный алерт вместо кастомного
                 print("Ошибка авторизации:", error.localizedDescription)
                 DispatchQueue.main.async {
-                    let alert = UIAlertController(
-                        title: "Ошибка",
-                        message: error.localizedDescription,
-                        preferredStyle: .alert
-                    )
-                    alert.addAction(UIAlertAction(title: "OK", style: .default))
-                    // Показываем alert на текущем view controller
-                    self.present(alert, animated: true)
+                    self.showAuthErrorAlert()
                 }
             }
         }
@@ -96,5 +86,18 @@ extension AuthViewController {
         oauth2Service.fetchAuthToken(code: code) { result in
             completion(result)
         }
+    }
+}
+
+// ADDED: метод для показа алерта с ошибкой
+extension AuthViewController {
+    private func showAuthErrorAlert() {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }

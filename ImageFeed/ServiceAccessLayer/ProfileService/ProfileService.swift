@@ -34,7 +34,6 @@ final class ProfileService {
     
     private var task: URLSessionTask?
     private let urlSession = URLSession.shared
-    // ADDED: свойство для хранения профиля
     private(set) var profile: Profile?
 
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
@@ -45,25 +44,21 @@ final class ProfileService {
             return
         }
 
-        let task = urlSession.data(for: request) { [weak self] result in
+        // CHANGE: использование objectTask вместо data
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
             switch result {
-            case .success(let data):
-                do {
-                    let profileResult = try JSONDecoder().decode(ProfileResult.self, from: data)
-
-                    let profile = Profile(
-                        username: profileResult.username,
-                        name: "\(profileResult.firstName) \(profileResult.lastName)",
-                        loginName: "@\(profileResult.username)",
-                        bio: profileResult.bio
-                    )
-                    // ADDED: сохранение профиля
-                    self?.profile = profile
-                    completion(.success(profile))
-                } catch {
-                    completion(.failure(error))
-                }
+            case .success(let profileResult):
+                let profile = Profile(
+                    username: profileResult.username,
+                    name: "\(profileResult.firstName) \(profileResult.lastName)",
+                    loginName: "@\(profileResult.username)",
+                    bio: profileResult.bio
+                )
+                self?.profile = profile
+                completion(.success(profile))
             case .failure(let error):
+                // ADDED: логирование ошибок
+                print("[fetchProfile]: Ошибка - \(error.localizedDescription)")
                 completion(.failure(error))
             }
             self?.task = nil

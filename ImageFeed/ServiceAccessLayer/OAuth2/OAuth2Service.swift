@@ -11,8 +11,13 @@ enum AuthServiceError: Error {
     case invalidRequest
 }
 
-struct OAuthTokenResponseBody: Decodable {
-    let access_token: String
+// CHANGE: структура с CamelCase
+struct OAuthTokenResponseBody: Codable {
+    let accessToken: String
+
+    enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
+    }
 }
 
 final class OAuth2Service {
@@ -28,13 +33,11 @@ final class OAuth2Service {
     func fetchAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         
-        // CHANGE: добавлена проверка на повторный запрос с тем же кодом
         guard lastCode != code else {
             completion(.failure(AuthServiceError.invalidRequest))
             return
         }
         
-        // CHANGE: отмена предыдущего запроса
         task?.cancel()
         lastCode = code
         
@@ -43,38 +46,29 @@ final class OAuth2Service {
             return
         }
         
-        let task = urlSession.data(for: request) { [weak self] result in
-            // CHANGE: сброс состояния после завершения запроса
+        // CHANGE: использование objectTask вместо data
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             DispatchQueue.main.async {
                 self?.task = nil
                 self?.lastCode = nil
             }
             
             switch result {
-            case .success(let data):
-                do {
-                    let responseBody = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                    self?.tokenStorage.token = responseBody.access_token
-                    print("OAuth token received:", responseBody.access_token)
-                    DispatchQueue.main.async {
-                        completion(.success(responseBody.access_token))
-                    }
-                } catch {
-                    print("Decoding error:", error)
-                    DispatchQueue.main.async {
-                        completion(.failure(NetworkError.decodingError(error)))
-                    }
+            case .success(let responseBody):
+                self?.tokenStorage.token = responseBody.accessToken
+                print("OAuth token received:", responseBody.accessToken)
+                DispatchQueue.main.async {
+                    completion(.success(responseBody.accessToken))
                 }
-                
             case .failure(let error):
-                print("Network error:", error)
+                // ADDED: логирование ошибок
+                print("[fetchAuthToken]: Ошибка - \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     completion(.failure(error))
                 }
             }
         }
         
-        // CHANGE: сохранение текущей задачи
         self.task = task
         task.resume()
     }
