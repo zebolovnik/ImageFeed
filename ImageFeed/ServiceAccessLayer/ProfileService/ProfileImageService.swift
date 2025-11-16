@@ -28,16 +28,16 @@ struct UserResult: Codable {
 }
 
 final class ProfileImageService {
-    // Синглтон
     static let shared = ProfileImageService()
     private init() {}
 
-    // Приватное свойство для хранения URL аватарки
+    // ADDED: нотификация для обновления аватарки
+    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
+
     private(set) var avatarURL: String?
 
     private var task: URLSessionTask?
 
-    // Метод для получения аватарки по имени пользователя
     func fetchProfileImageURL(username: String, completion: @escaping (Result<String, Error>) -> Void) {
         task?.cancel()
 
@@ -61,13 +61,20 @@ final class ProfileImageService {
 
                     self.avatarURL = userResult.profileImage.small
                     completion(.success(userResult.profileImage.small))
+                    
+                    // ADDED: отправка нотификации с URL аватарки
+                    NotificationCenter.default
+                        .post(
+                            name: ProfileImageService.didChangeNotification,
+                            object: self,
+                            userInfo: ["URL": userResult.profileImage.small])
                 } catch {
                     print(error)
                 }
 
             case .failure(let error):
                 print("[fetchProfileImageURL]: Ошибка запроса: \(error.localizedDescription)")
-                completion(.failure(error)) // Прокидываем ошибку
+                completion(.failure(error))
             }
         }
 

@@ -9,7 +9,6 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
-    // MARK: - Constants
     private enum Constants {
         static let avatarSize: CGFloat = 70
         static let avatarCornerRadius: CGFloat = 35
@@ -22,14 +21,15 @@ final class ProfileViewController: UIViewController {
         static let logoutTrailing: CGFloat = -16
     }
     
-    // MARK: - UI элементы
     private let avatarImageView = UIImageView()
     private let nameLabel = UILabel()
     private let loginNameLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let logoutButton = UIButton()
     
-    // MARK: - Lifecycle
+    // ADDED: observer для нотификации
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "YP Black")
@@ -38,8 +38,21 @@ final class ProfileViewController: UIViewController {
         setupLabels()
         setupLogoutButton()
         
-        // CHANGE: обновление UI из сохраненного профиля
         updateUIFromProfile()
+        
+        // ADDED: подписка на нотификации об изменении аватарки
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        
+        // ADDED: первоначальное обновление аватарки
+        updateAvatar()
     }
 }
 
@@ -62,19 +75,16 @@ private extension ProfileViewController {
     }
     
     private func setupLabels() {
-        // Имя
         nameLabel.text = ""
         nameLabel.textColor = UIColor(named: "YP White")
         nameLabel.font = UIFont.boldSystemFont(ofSize: 23)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Логин
         loginNameLabel.text = ""
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13)
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Описание
         descriptionLabel.text = ""
         descriptionLabel.textColor = UIColor(named: "YP White")
         descriptionLabel.font = UIFont.systemFont(ofSize: 13)
@@ -108,13 +118,23 @@ private extension ProfileViewController {
         ])
     }
     
-    // CHANGE: обновление UI из сохраненного профиля
     func updateUIFromProfile() {
         guard let profile = ProfileService.shared.profile else { return }
         
         nameLabel.text = profile.name
         loginNameLabel.text = profile.loginName
         descriptionLabel.text = profile.bio
+    }
+    
+    // ADDED: метод обновления аватарки
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        
+        // TODO: добавить загрузку аватарки через Kingfisher
+        print("Avatar URL ready:", profileImageURL)
     }
 }
 
