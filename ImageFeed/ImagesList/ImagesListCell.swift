@@ -16,6 +16,8 @@ final class ImagesListCell: UITableViewCell {
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var gradientView: UIView!
     
+    weak var delegate: ImagesListCellDelegate?
+    
     private let gradientLayer = CAGradientLayer()
     
     override func awakeFromNib() {
@@ -43,6 +45,10 @@ final class ImagesListCell: UITableViewCell {
         super.prepareForReuse()
         // Отменяем загрузку изображения при переиспользовании ячейки
         cellImage.kf.cancelDownloadTask()
+    }
+    
+    @IBAction private func likeButtonClicked() {
+        delegate?.imageListCellDidTapLike(self)
     }
     
     func setIsLiked(_ isLiked: Bool) {

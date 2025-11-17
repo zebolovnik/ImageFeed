@@ -14,7 +14,8 @@ struct Photo {
     let welcomeDescription: String?
     let thumbImageURL: String
     let largeImageURL: String
-    let isLiked: Bool
+    let fullImageURL: String
+    var isLiked: Bool
 }
 
 struct PhotoResult: Decodable {
@@ -43,4 +44,8 @@ struct UrlsResult: Decodable {
     let regular: String?
     let small: String?
     let thumb: String?
+}
+
+struct LikePhotosResult: Decodable {
+    let photo: PhotoResult
 }

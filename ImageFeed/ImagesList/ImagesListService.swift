@@ -59,6 +59,7 @@ final class ImagesListService {
                         welcomeDescription: photoResult.description,
                         thumbImageURL: thumbImageURL,
                         largeImageURL: largeImageURL,
+                        fullImageURL: largeImageURL, // Используем largeImageURL как fullImageURL
                         isLiked: photoResult.likedByUser
                     )
                     photos.append(photo)
@@ -75,6 +76,50 @@ final class ImagesListService {
                 
             case .failure(let error):
                 print("Ошибка загрузки: \(error.localizedDescription)")
+            }
+        }
+        
+        self.task = task
+        task.resume()
+    }
+    
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+        assert(Thread.isMainThread)
+        guard task == nil else {
+            print("[changeLike] the page is still loading")
+            return
+        }
+        
+        guard let request = makeLikeRequest(photoId: photoId, isLike: isLike) else {
+            print("⚠️ invalid request")
+            return
+        }
+        
+        let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<LikePhotosResult, Error>) in
+            DispatchQueue.main.async {
+                self?.task = nil
+            }
+            
+            switch result {
+            case .success:
+                if let index = self?.photos.firstIndex(where: { $0.id == photoId }) {
+                    let photo = self!.photos[index]
+                    let newPhoto = Photo(
+                        id: photo.id,
+                        size: photo.size,
+                        createdAt: photo.createdAt,
+                        welcomeDescription: photo.welcomeDescription,
+                        thumbImageURL: photo.thumbImageURL,
+                        largeImageURL: photo.largeImageURL,
+                        fullImageURL: photo.fullImageURL,
+                        isLiked: !photo.isLiked
+                    )
+                    self?.photos[index] = newPhoto
+                }
+                completion(.success(()))
+            case .failure(let error):
+                print("Error in changeLike: \(error)")
+                completion(.failure(error))
             }
         }
         
@@ -101,6 +146,19 @@ final class ImagesListService {
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return request
+    }
+    
+    private func makeLikeRequest(photoId: String, isLike: Bool) -> URLRequest? {
+        guard let token = OAuth2TokenStorage.shared.token else {
+            print("Ошибка при создании запроса: отсутствует токен")
+            return nil
+        }
+        
+        let likeURL = Constants.photosURL.appendingPathComponent("\(photoId)/like")
+        var request = URLRequest(url: likeURL)
+        request.httpMethod = isLike ? "POST" : "DELETE"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
     }

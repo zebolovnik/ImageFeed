@@ -92,6 +92,7 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
+        imageListCell.delegate = self
         configCell(for: imageListCell, with: indexPath)
         return imageListCell
     }
@@ -110,7 +111,7 @@ extension ImagesListViewController {
             )
         }
         
-        // CHANGE: используем реальную дату создания фото вместо моковой
+        // Используем реальную дату создания фото
         if let date = photo.createdAt {
             cell.dateLabel.text = dateFormatter.string(from: date)
         } else {
@@ -142,6 +143,32 @@ extension ImagesListViewController: UITableViewDelegate {
         // Загружаем следующую страницу когда подходим к концу
         if indexPath.row + 1 == photos.count {
             imagesListService.fetchPhotosNextPage()
+        }
+    }
+}
+
+// MARK: - ImagesListCellDelegate
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imageListCellDidTapLike(_ cell: ImagesListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let photo = photos[indexPath.row]
+        
+        UIBlockingProgressHUD.show()
+        
+        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+            DispatchQueue.main.async {
+                UIBlockingProgressHUD.dismiss()
+                
+                switch result {
+                case .success:
+                    if let index = self?.photos.firstIndex(where: { $0.id == photo.id }) {
+                        self?.photos[index].isLiked = !photo.isLiked
+                        cell.setIsLiked(!photo.isLiked)
+                    }
+                case .failure(let error):
+                    print("Ошибка при изменении лайка: \(error)")
+                }
+            }
         }
     }
 }
