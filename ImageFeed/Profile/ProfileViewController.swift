@@ -6,10 +6,10 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
-    // MARK: - Constants
     private enum Constants {
         static let avatarSize: CGFloat = 70
         static let avatarCornerRadius: CGFloat = 35
@@ -20,20 +20,16 @@ final class ProfileViewController: UIViewController {
         static let loginTopOffset: CGFloat = 8
         static let descriptionTopOffset: CGFloat = 8
         static let logoutTrailing: CGFloat = -16
-
-        static let nameText = "Екатерина Новикова"
-        static let loginText = "@ekaterina_nov"
-        static let descriptionText = "Hello, world!"
     }
     
-    // MARK: - UI элементы
     private let avatarImageView = UIImageView()
     private let nameLabel = UILabel()
     private let loginNameLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let logoutButton = UIButton()
     
-    // MARK: - Lifecycle
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "YP Black")
@@ -41,6 +37,20 @@ final class ProfileViewController: UIViewController {
         setupAvatarImageView()
         setupLabels()
         setupLogoutButton()
+        
+        updateUIFromProfile()
+        
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        
+        updateAvatar()
     }
 }
 
@@ -48,7 +58,8 @@ final class ProfileViewController: UIViewController {
 private extension ProfileViewController {
     
     func setupAvatarImageView() {
-        avatarImageView.image = UIImage(named: "avatar")
+        // CHANGE: убрана моковая картинка, будет загружаться из сети
+        avatarImageView.image = nil
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         avatarImageView.layer.cornerRadius = Constants.avatarCornerRadius
         avatarImageView.clipsToBounds = true
@@ -63,23 +74,21 @@ private extension ProfileViewController {
     }
     
     private func setupLabels() {
-        // Имя
-        nameLabel.text = Constants.nameText
+        nameLabel.text = ""
         nameLabel.textColor = UIColor(named: "YP White")
         nameLabel.font = UIFont.boldSystemFont(ofSize: 23)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Логин
-        loginNameLabel.text = Constants.loginText
+        loginNameLabel.text = ""
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13)
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Описание
-        descriptionLabel.text = Constants.descriptionText
+        descriptionLabel.text = ""
         descriptionLabel.textColor = UIColor(named: "YP White")
         descriptionLabel.font = UIFont.systemFont(ofSize: 13)
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        descriptionLabel.numberOfLines = 0
         
         [nameLabel, loginNameLabel, descriptionLabel].forEach { view.addSubview($0) }
         
@@ -107,12 +116,60 @@ private extension ProfileViewController {
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: Constants.logoutTrailing)
         ])
     }
+    
+    func updateUIFromProfile() {
+        guard let profile = ProfileService.shared.profile else { return }
+        
+        nameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
+    }
+    
+    // CHANGE: реализация загрузки аватарки через Kingfisher
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let imageUrl = URL(string: profileImageURL)
+        else { return }
+        
+        print("🔄 Loading avatar from:", profileImageURL)
+        
+        // CHANGE: сначала масштабируем до размера аватарки, потом скругляем
+        let processor = ResizingImageProcessor(
+            referenceSize: CGSize(width: Constants.avatarSize, height: Constants.avatarSize)
+        ).append(
+            another: RoundCornerImageProcessor(cornerRadius: Constants.avatarSize / 2)
+        )
+        
+        avatarImageView.kf.indicatorType = .activity
+        
+        // CHANGE: улучшенные параметры загрузки
+        avatarImageView.kf.setImage(
+            with: imageUrl,
+            placeholder: UIImage(named: "avatar"), // временная заглушка
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .transition(.fade(0.2)), // плавное появление
+                .cacheOriginalImage // кэшируем оригинал для лучшего качества
+            ]) { result in
+                switch result {
+                case .success(let value):
+                    print("✅ Avatar loaded from:", value.cacheType)
+                case .failure(let error):
+                    print("❌ Avatar load failed:", error)
+                    // Пробуем загрузить еще раз при ошибке
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        self.avatarImageView.kf.setImage(with: imageUrl)
+                    }
+                }
+            }
+    }
 }
 
 // MARK: - Actions
 private extension ProfileViewController {
     @objc func didTapLogoutButton() {
-        // TODO: добавить логику выхода позже
         print("Logout tapped")
     }
 }

@@ -11,4 +11,9 @@ enum Constants {
         }
         return url
     }()
+    
+    // ADDED: базовый URL для API пользователей
+    static let usersBaseURL: URL = {
+        return defaultBaseURL.appendingPathComponent("/users")
+    }()
 }

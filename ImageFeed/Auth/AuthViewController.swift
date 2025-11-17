@@ -49,8 +49,11 @@ final class AuthViewController: UIViewController {
 // MARK: - WebViewViewControllerDelegate
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        // УБЕРИТЕ отсюда dismiss - он закрывает WebView слишком рано
+        UIBlockingProgressHUD.show()
+        
         fetchOAuthToken(code) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            
             guard let self = self else { return }
             
             switch result {
@@ -66,8 +69,8 @@ extension AuthViewController: WebViewViewControllerDelegate {
                 print("Ошибка авторизации:", error.localizedDescription)
                 DispatchQueue.main.async {
                     let alert = UIAlertController(
-                        title: "Ошибка",
-                        message: error.localizedDescription,
+                        title: "Что-то пошло не так(",
+                        message: "Не удалось войти в систему",
                         preferredStyle: .alert
                     )
                     alert.addAction(UIAlertAction(title: "OK", style: .default))
