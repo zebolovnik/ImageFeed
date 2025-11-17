@@ -16,4 +16,9 @@ enum Constants {
     static let usersBaseURL: URL = {
         return defaultBaseURL.appendingPathComponent("/users")
     }()
+    
+    // ADDED: URL для загрузки фотографий
+    static let photosURL: URL = {
+        return defaultBaseURL.appendingPathComponent("/photos")
+    }()
 }
