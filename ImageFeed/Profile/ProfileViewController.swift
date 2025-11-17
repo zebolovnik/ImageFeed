@@ -6,7 +6,6 @@
 //
 
 import UIKit
-// ADDED: импорт Kingfisher
 import Kingfisher
 
 final class ProfileViewController: UIViewController {
@@ -135,7 +134,13 @@ private extension ProfileViewController {
         
         print("🔄 Loading avatar from:", profileImageURL)
         
-        let processor = RoundCornerImageProcessor(cornerRadius: Constants.avatarCornerRadius)
+        // CHANGE: сначала масштабируем до размера аватарки, потом скругляем
+        let processor = ResizingImageProcessor(
+            referenceSize: CGSize(width: Constants.avatarSize, height: Constants.avatarSize)
+        ).append(
+            another: RoundCornerImageProcessor(cornerRadius: Constants.avatarSize / 2)
+        )
+        
         avatarImageView.kf.indicatorType = .activity
         
         // CHANGE: улучшенные параметры загрузки

@@ -7,26 +7,6 @@
 
 import Foundation
 
-struct ProfileImage: Codable {
-    let small: String
-    let medium: String
-    let large: String
-    
-    private enum CodingKeys: String, CodingKey {
-        case small
-        case medium
-        case large
-    }
-}
-
-struct UserResult: Codable {
-    let profileImage: ProfileImage
-    
-    private enum CodingKeys: String, CodingKey {
-        case profileImage = "profile_image"
-    }
-}
-
 final class ProfileImageService {
     static let shared = ProfileImageService()
     private init() {}
@@ -79,9 +59,7 @@ final class ProfileImageService {
     }
     
     private func makeProfileImageRequest(username: String, token: String) -> URLRequest? {
-        guard let url = URL(string: "https://api.unsplash.com/users/\(username)") else {
-            return nil
-        }
+        let url = Constants.usersBaseURL.appendingPathComponent(username)
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
