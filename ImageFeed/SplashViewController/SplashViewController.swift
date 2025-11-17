@@ -8,19 +8,23 @@
 import UIKit
 
 final class SplashViewController: UIViewController {
-    private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
-    
     private let storage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
-    
+
+    private var imageView: UIImageView!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupImageView()
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+
         if let token = storage.token {
-            // Если есть токен, загружаем профиль и потом переходим
             fetchProfileAndSwitch(token: token)
         } else {
-            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            presentAuthViewController()
         }
     }
     
@@ -31,6 +35,28 @@ final class SplashViewController: UIViewController {
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
+    }
+
+    private func setupImageView() {
+        let imageSplashScreenLogo = UIImage(named: "splashScreenLogo")
+        imageView = UIImageView(image: imageSplashScreenLogo)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(imageView)
+        
+        NSLayoutConstraint.activate([
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+    
+    private func presentAuthViewController() {
+        let storyboard = UIStoryboard(name: "Main", bundle: .main)
+        guard let authViewController = storyboard.instantiateViewController(
+            withIdentifier: "AuthViewController"
+        ) as? AuthViewController else { return }
+        authViewController.delegate = self
+        authViewController.modalPresentationStyle = .fullScreen
+        present(authViewController, animated: true)
     }
     
     private func switchToTabBarController() {
@@ -54,7 +80,6 @@ final class SplashViewController: UIViewController {
             switch result {
             case .success(let profile):
                 print("✅ Profile fetched successfully:", profile.username)
-                // CHANGE: ждем завершения загрузки аватарки перед переходом
                 ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { avatarResult in
                     switch avatarResult {
                     case .success(let avatarURL):
@@ -62,7 +87,6 @@ final class SplashViewController: UIViewController {
                     case .failure(let error):
                         print("❌ Avatar URL load failed:", error)
                     }
-                    // Переходим только после попытки загрузки аватарки
                     self.switchToTabBarController()
                 }
             case .failure(let error):
@@ -73,26 +97,8 @@ final class SplashViewController: UIViewController {
     }
 }
 
-extension SplashViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == showAuthenticationScreenSegueIdentifier {
-            guard
-                let navigationController = segue.destination as? UINavigationController,
-                let viewController = navigationController.viewControllers.first as? AuthViewController
-            else {
-                assertionFailure("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")
-                return
-            }
-            viewController.delegate = self
-        } else {
-            super.prepare(for: segue, sender: sender)
-        }
-    }
-}
-
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
-        // Закрываем AuthViewController и переходим на главный экран
         vc.dismiss(animated: true) { [weak self] in
             guard let self = self, let token = self.storage.token else { return }
             self.fetchProfileAndSwitch(token: token)
