@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ImagesListViewController: UIViewController {
     @IBOutlet private weak var tableView: UITableView!
@@ -28,6 +29,7 @@ final class ImagesListViewController: UIViewController {
         
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         
+        // Подписываемся на нотификации
         imagesListServiceObserver = NotificationCenter.default
             .addObserver(
                 forName: ImagesListService.didChangeNotification,
@@ -38,7 +40,7 @@ final class ImagesListViewController: UIViewController {
                 self.updateTableViewAnimated()
             }
         
-        // Загружаем первую страницу фотографий
+        // Загружаем первую страницу
         imagesListService.fetchPhotosNextPage()
     }
     
@@ -100,9 +102,12 @@ extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         let photo = photos[indexPath.row]
         
-        // Загружаем изображение
+        // Загружаем изображение с заглушкой
         if let url = URL(string: photo.thumbImageURL) {
-            cell.cellImage.kf.setImage(with: url)
+            cell.cellImage.kf.setImage(
+                with: url,
+                placeholder: UIImage(named: "stub") // твой плейсхолдер
+            )
         }
         
         // Устанавливаем дату
@@ -112,7 +117,7 @@ extension ImagesListViewController {
             cell.dateLabel.text = ""
         }
         
-        // Устанавливаем лайк
+        // Устанавливаем лайк из данных фото
         cell.setIsLiked(photo.isLiked)
     }
 }
