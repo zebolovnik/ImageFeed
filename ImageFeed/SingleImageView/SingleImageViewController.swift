@@ -77,10 +77,14 @@ final class SingleImageViewController: UIViewController {
     private func showErrorAlert() {
         let alert = UIAlertController(
             title: "Что-то пошло не так",
-            message: "Не удалось загрузить изображение",
+            message: "Попробовать еще раз?",
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        alert.addAction(UIAlertAction(title: "Не надо", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Повторить", style: .default, handler: { [weak self] _ in
+            guard let self = self, let photo = self.photo else { return }
+            self.loadAndDisplayImage(from: photo.largeImageURL)
+        }))
         present(alert, animated: true)
     }
     
