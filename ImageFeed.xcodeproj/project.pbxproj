@@ -114,13 +114,13 @@
 		2E4E70732CA9163E001759B9 /* ImageFeed */ = {
 			isa = PBXGroup;
 			children = (
-				2E8DFD102ECB3AE400443667 /* TabBarController.swift */,
 				2EFBE6282EB5FF190016AA26 /* Constants.swift */,
 				2E4E70742CA9163E001759B9 /* AppDelegate.swift */,
 				2E4E70762CA9163E001759B9 /* SceneDelegate.swift */,
 				2E8DFCFB2EC8B0AD00443667 /* Views */,
 				2E8AEAB72EB67123009524BC /* ServiceAccessLayer */,
 				2E8AEAB62EB670A0009524BC /* SplashViewController */,
+				2E8DFD132ECB415500443667 /* TabBarController */,
 				2E0CE05C2EB6184F001E5615 /* Auth */,
 				2E5E94502EA0C3E40091E79D /* Profile */,
 				2E1B5D7C2E9CBB8D005B9EE8 /* ImagesList */,
@@ -190,6 +190,14 @@
 				2E8DFD002EC8B5C900443667 /* ProfileService.swift */,
 			);
 			path = ProfileService;
+			sourceTree = "<group>";
+		};
+		2E8DFD132ECB415500443667 /* TabBarController */ = {
+			isa = PBXGroup;
+			children = (
+				2E8DFD102ECB3AE400443667 /* TabBarController.swift */,
+			);
+			path = TabBarController;
 			sourceTree = "<group>";
 		};
 		2EC8DE1C2EB64AD700829A54 /* Frameworks */ = {
