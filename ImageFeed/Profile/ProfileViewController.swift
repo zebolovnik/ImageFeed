@@ -6,6 +6,8 @@
 //
 
 import UIKit
+// ADDED: импорт Kingfisher
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
@@ -27,7 +29,6 @@ final class ProfileViewController: UIViewController {
     private let descriptionLabel = UILabel()
     private let logoutButton = UIButton()
     
-    // ADDED: observer для нотификации
     private var profileImageServiceObserver: NSObjectProtocol?
     
     override func viewDidLoad() {
@@ -40,7 +41,6 @@ final class ProfileViewController: UIViewController {
         
         updateUIFromProfile()
         
-        // ADDED: подписка на нотификации об изменении аватарки
         profileImageServiceObserver = NotificationCenter.default
             .addObserver(
                 forName: ProfileImageService.didChangeNotification,
@@ -51,7 +51,6 @@ final class ProfileViewController: UIViewController {
                 self.updateAvatar()
             }
         
-        // ADDED: первоначальное обновление аватарки
         updateAvatar()
     }
 }
@@ -60,7 +59,8 @@ final class ProfileViewController: UIViewController {
 private extension ProfileViewController {
     
     func setupAvatarImageView() {
-        avatarImageView.image = UIImage(named: "avatar")
+        // CHANGE: убрана моковая картинка, будет загружаться из сети
+        avatarImageView.image = nil
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         avatarImageView.layer.cornerRadius = Constants.avatarCornerRadius
         avatarImageView.clipsToBounds = true
@@ -126,15 +126,39 @@ private extension ProfileViewController {
         descriptionLabel.text = profile.bio
     }
     
-    // ADDED: метод обновления аватарки
+    // CHANGE: реализация загрузки аватарки через Kingfisher
     private func updateAvatar() {
         guard
             let profileImageURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: profileImageURL)
+            let imageUrl = URL(string: profileImageURL)
         else { return }
         
-        // TODO: добавить загрузку аватарки через Kingfisher
-        print("Avatar URL ready:", profileImageURL)
+        print("🔄 Loading avatar from:", profileImageURL)
+        
+        let processor = RoundCornerImageProcessor(cornerRadius: Constants.avatarCornerRadius)
+        avatarImageView.kf.indicatorType = .activity
+        
+        // CHANGE: улучшенные параметры загрузки
+        avatarImageView.kf.setImage(
+            with: imageUrl,
+            placeholder: UIImage(named: "avatar"), // временная заглушка
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .transition(.fade(0.2)), // плавное появление
+                .cacheOriginalImage // кэшируем оригинал для лучшего качества
+            ]) { result in
+                switch result {
+                case .success(let value):
+                    print("✅ Avatar loaded from:", value.cacheType)
+                case .failure(let error):
+                    print("❌ Avatar load failed:", error)
+                    // Пробуем загрузить еще раз при ошибке
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        self.avatarImageView.kf.setImage(with: imageUrl)
+                    }
+                }
+            }
     }
 }
 

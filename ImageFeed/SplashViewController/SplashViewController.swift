@@ -17,7 +17,8 @@ final class SplashViewController: UIViewController {
         super.viewDidAppear(animated)
         
         if let token = storage.token {
-            fetchProfile(token: token)
+            // Если есть токен, загружаем профиль и потом переходим
+            fetchProfileAndSwitch(token: token)
         } else {
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
@@ -43,7 +44,7 @@ final class SplashViewController: UIViewController {
         window.rootViewController = tabBarController
     }
     
-    private func fetchProfile(token: String) {
+    private func fetchProfileAndSwitch(token: String) {
         UIBlockingProgressHUD.show()
         profileService.fetchProfile(token) { [weak self] result in
             UIBlockingProgressHUD.dismiss()
@@ -52,11 +53,21 @@ final class SplashViewController: UIViewController {
             
             switch result {
             case .success(let profile):
-                // ADDED: загрузка аватарки (не дожидаясь завершения)
-                ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { _ in }
-                self.switchToTabBarController()
+                print("✅ Profile fetched successfully:", profile.username)
+                // CHANGE: ждем завершения загрузки аватарки перед переходом
+                ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { avatarResult in
+                    switch avatarResult {
+                    case .success(let avatarURL):
+                        print("✅ Avatar URL loaded:", avatarURL)
+                    case .failure(let error):
+                        print("❌ Avatar URL load failed:", error)
+                    }
+                    // Переходим только после попытки загрузки аватарки
+                    self.switchToTabBarController()
+                }
             case .failure(let error):
-                print("Ошибка загрузки профиля:", error)
+                print("❌ Profile fetch failed:", error.localizedDescription)
+                self.switchToTabBarController()
             }
         }
     }
@@ -81,9 +92,10 @@ extension SplashViewController {
 
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
-        vc.dismiss(animated: true)
-        
-        guard let token = storage.token else { return }
-        fetchProfile(token: token)
+        // Закрываем AuthViewController и переходим на главный экран
+        vc.dismiss(animated: true) { [weak self] in
+            guard let self = self, let token = self.storage.token else { return }
+            self.fetchProfileAndSwitch(token: token)
+        }
     }
 }

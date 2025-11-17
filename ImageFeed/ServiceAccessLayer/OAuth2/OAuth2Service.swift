@@ -11,7 +11,6 @@ enum AuthServiceError: Error {
     case invalidRequest
 }
 
-// CHANGE: структура с CamelCase
 struct OAuthTokenResponseBody: Codable {
     let accessToken: String
 
@@ -46,8 +45,14 @@ final class OAuth2Service {
             return
         }
         
-        // CHANGE: использование objectTask вместо data
+        // ADDED: логирование запроса
+        print("[fetchAuthToken] Making OAuth request with code:", code.prefix(10) + "...")
+        print("[fetchAuthToken] Request URL:", request.url?.absoluteString ?? "nil")
+        
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
+            // ADDED: детальное логирование результата
+            print("[fetchAuthToken] OAuth result received")
+            
             DispatchQueue.main.async {
                 self?.task = nil
                 self?.lastCode = nil
@@ -55,14 +60,40 @@ final class OAuth2Service {
             
             switch result {
             case .success(let responseBody):
+                print("✅ OAuth SUCCESS - Token received:", responseBody.accessToken.prefix(10) + "...")
+                print("✅ Full token length:", responseBody.accessToken.count)
                 self?.tokenStorage.token = responseBody.accessToken
-                print("OAuth token received:", responseBody.accessToken)
+                
+                // ADDED: проверка сохранения токена
+                if let savedToken = self?.tokenStorage.token {
+                    print("✅ Token saved successfully:", savedToken.prefix(10) + "...")
+                } else {
+                    print("❌ Token NOT saved to storage!")
+                }
+                
                 DispatchQueue.main.async {
                     completion(.success(responseBody.accessToken))
                 }
             case .failure(let error):
-                // ADDED: логирование ошибок
-                print("[fetchAuthToken]: Ошибка - \(error.localizedDescription)")
+                print("❌ OAuth FAILED - Error:", error)
+                print("❌ Error type:", type(of: error))
+                
+                // ADDED: дополнительная информация для NetworkError
+                if let networkError = error as? NetworkError {
+                    switch networkError {
+                    case .httpStatusCode(let code):
+                        print("❌ HTTP Status Code:", code)
+                    case .decodingError(let decodingError):
+                        print("❌ Decoding Error:", decodingError)
+                    case .urlRequestError(let requestError):
+                        print("❌ Request Error:", requestError)
+                    case .urlSessionError:
+                        print("❌ URL Session Error")
+                    case .invalidRequest:
+                        print("❌ Invalid Request")
+                    }
+                }
+                
                 DispatchQueue.main.async {
                     completion(.failure(error))
                 }

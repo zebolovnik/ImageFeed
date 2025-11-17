@@ -50,7 +50,6 @@ final class ProfileImageService {
             return
         }
 
-        // CHANGE: использование objectTask вместо data
         let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
             switch result {
             case .success(let userResult):
@@ -58,14 +57,18 @@ final class ProfileImageService {
 
                 self.avatarURL = userResult.profileImage.small
                 completion(.success(userResult.profileImage.small))
-                
+
+                // CHANGE: принудительно отправляем нотификацию
                 NotificationCenter.default
                     .post(
                         name: ProfileImageService.didChangeNotification,
                         object: self,
-                        userInfo: ["URL": userResult.profileImage.small])
+                        userInfo: ["URL": userResult.profileImage.small]
+                    )
+                
+                print("✅ Avatar URL notification sent")
+
             case .failure(let error):
-                // ADDED: логирование ошибок
                 print("[fetchProfileImageURL]: Ошибка - \(error.localizedDescription)")
                 completion(.failure(error))
             }
