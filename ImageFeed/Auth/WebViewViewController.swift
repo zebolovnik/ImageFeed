@@ -59,11 +59,11 @@ final class WebViewViewController: UIViewController {
         // CHANGE: новое KVO API вместо addObserver
         estimatedProgressObservation = webView.observe(
             \.estimatedProgress,
-            options: [],
-            changeHandler: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.updateProgress()
-            })
+             options: [],
+             changeHandler: { [weak self] _, _ in
+                 guard let self = self else { return }
+                 self.updateProgress()
+             })
         
         updateProgress()
     }

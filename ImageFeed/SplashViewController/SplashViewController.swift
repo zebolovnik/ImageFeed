@@ -10,17 +10,17 @@ import UIKit
 final class SplashViewController: UIViewController {
     private let storage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
-
+    
     private var imageView: UIImageView!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupImageView()
     }
-
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        
         if let token = storage.token {
             fetchProfileAndSwitch(token: token)
         } else {
@@ -36,7 +36,7 @@ final class SplashViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
-
+    
     private func setupImageView() {
         let imageSplashScreenLogo = UIImage(named: "splashScreenLogo")
         imageView = UIImageView(image: imageSplashScreenLogo)
