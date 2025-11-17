@@ -106,11 +106,11 @@ extension ImagesListViewController {
         if let url = URL(string: photo.thumbImageURL) {
             cell.cellImage.kf.setImage(
                 with: url,
-                placeholder: UIImage(named: "stub") // твой плейсхолдер
+                placeholder: UIImage(named: "stub")
             )
         }
         
-        // Устанавливаем дату
+        // CHANGE: используем реальную дату создания фото вместо моковой
         if let date = photo.createdAt {
             cell.dateLabel.text = dateFormatter.string(from: date)
         } else {
