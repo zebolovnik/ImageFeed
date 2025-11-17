@@ -104,4 +104,8 @@ final class ImagesListService {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
     }
+    
+    func resetImages() {
+        photos = []
+    }
 }

@@ -9,7 +9,6 @@ import UIKit
 import Kingfisher
 
 final class ProfileViewController: UIViewController {
-    
     private enum Constants {
         static let avatarSize: CGFloat = 70
         static let avatarCornerRadius: CGFloat = 35
@@ -29,6 +28,7 @@ final class ProfileViewController: UIViewController {
     private let logoutButton = UIButton()
     
     private var profileImageServiceObserver: NSObjectProtocol?
+    private let profileLogoutService = ProfileLogoutService.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,13 +52,44 @@ final class ProfileViewController: UIViewController {
         
         updateAvatar()
     }
+    
+    @objc private func didTapLogoutButton() {
+        showExitAlert()
+    }
+    
+    private func showExitAlert() {
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены, что хотите выйти?",
+            preferredStyle: .alert
+        )
+        let noAction = UIAlertAction(title: "Нет", style: .default)
+        let yesAction = UIAlertAction(title: "Да", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.profileLogoutService.logout()
+            self.switchToSplashScreen()
+        }
+        alert.addAction(noAction)
+        alert.addAction(yesAction)
+        present(alert, animated: true)
+    }
+    
+    private func switchToSplashScreen() {
+        guard let window = UIApplication.shared.windows.first else {
+            assertionFailure("Invalid window configuration")
+            return
+        }
+        
+        let splashViewController = SplashViewController()
+        window.rootViewController = splashViewController
+        window.makeKeyAndVisible()
+    }
 }
 
 // MARK: - Private UI setup
 private extension ProfileViewController {
     
     func setupAvatarImageView() {
-        // CHANGE: убрана моковая картинка, будет загружаться из сети
         avatarImageView.image = nil
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         avatarImageView.layer.cornerRadius = Constants.avatarCornerRadius
@@ -125,16 +156,12 @@ private extension ProfileViewController {
         descriptionLabel.text = profile.bio
     }
     
-    // CHANGE: реализация загрузки аватарки через Kingfisher
     private func updateAvatar() {
         guard
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let imageUrl = URL(string: profileImageURL)
         else { return }
         
-        print("🔄 Loading avatar from:", profileImageURL)
-        
-        // CHANGE: сначала масштабируем до размера аватарки, потом скругляем
         let processor = ResizingImageProcessor(
             referenceSize: CGSize(width: Constants.avatarSize, height: Constants.avatarSize)
         ).append(
@@ -142,34 +169,21 @@ private extension ProfileViewController {
         )
         
         avatarImageView.kf.indicatorType = .activity
-        
-        // CHANGE: улучшенные параметры загрузки
         avatarImageView.kf.setImage(
             with: imageUrl,
-            placeholder: UIImage(named: "avatar"), // временная заглушка
+            placeholder: UIImage(named: "stub"),
             options: [
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
-                .transition(.fade(0.2)), // плавное появление
-                .cacheOriginalImage // кэшируем оригинал для лучшего качества
+                .transition(.fade(0.2)),
+                .cacheOriginalImage
             ]) { result in
                 switch result {
                 case .success(let value):
                     print("✅ Avatar loaded from:", value.cacheType)
                 case .failure(let error):
                     print("❌ Avatar load failed:", error)
-                    // Пробуем загрузить еще раз при ошибке
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        self.avatarImageView.kf.setImage(with: imageUrl)
-                    }
                 }
             }
-    }
-}
-
-// MARK: - Actions
-private extension ProfileViewController {
-    @objc func didTapLogoutButton() {
-        print("Logout tapped")
     }
 }
