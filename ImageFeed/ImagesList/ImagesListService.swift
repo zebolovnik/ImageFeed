@@ -14,32 +14,30 @@ final class ImagesListService {
     static let didChangeNotification = Notification.Name(
         rawValue: "ImagesListServiceDidChange"
     )
-
+    
     private var lastLoadedPage: Int?
     private var task: URLSessionTask?
     private let dateFormatter = ISO8601DateFormatter()
-
+    private let urlSession = URLSession.shared
+    
     private(set) var photos: [Photo] = []
-
-    func fetchPhotosNextPage() {
+    
+    func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
         guard task == nil else {
-            print("the page is still loading")
+            print("[fetchPhotosNextPage] the page is still loading")
             return
         }
         
         let nextPage = (lastLoadedPage ?? 0) + 1
         let perPage = 10
-
+        
         guard let request = makePhotoRequest(page: nextPage, perPage: perPage) else {
             print("[fetchPhotosNextPage] invalid request")
+            completion(.failure(NetworkError.invalidRequest))
             return
         }
-
-        let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
-            DispatchQueue.main.async {
-                self?.task = nil
-            }
-            
+        
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
             switch result {
             case .success(let photoResults):
                 var photos: [Photo] = []
@@ -48,7 +46,6 @@ final class ImagesListService {
                         let thumbImageURL = photoResult.urls.thumb ?? photoResult.urls.small,
                         let largeImageURL = photoResult.urls.regular ?? photoResult.urls.full ?? photoResult.urls.raw
                     else {
-                        print("Не удалось получить URL изображения")
                         continue
                     }
                     
@@ -59,7 +56,7 @@ final class ImagesListService {
                         welcomeDescription: photoResult.description,
                         thumbImageURL: thumbImageURL,
                         largeImageURL: largeImageURL,
-                        fullImageURL: largeImageURL, // Используем largeImageURL как fullImageURL
+                        fullImageURL: largeImageURL,
                         isLiked: photoResult.likedByUser
                     )
                     photos.append(photo)
@@ -72,10 +69,16 @@ final class ImagesListService {
                         name: ImagesListService.didChangeNotification,
                         object: self
                     )
+                    completion(.success(photos))
                 }
                 
             case .failure(let error):
-                print("Ошибка загрузки: \(error.localizedDescription)")
+                print("[fetchPhotosNextPage] Download error: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+            
+            DispatchQueue.main.async {
+                self?.task = nil
             }
         }
         
@@ -91,15 +94,11 @@ final class ImagesListService {
         }
         
         guard let request = makeLikeRequest(photoId: photoId, isLike: isLike) else {
-            print("⚠️ invalid request")
+            print("[changeLike] invalid request")
             return
         }
         
-        let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<LikePhotosResult, Error>) in
-            DispatchQueue.main.async {
-                self?.task = nil
-            }
-            
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<LikePhotosResult, Error>) in
             switch result {
             case .success:
                 if let index = self?.photos.firstIndex(where: { $0.id == photoId }) {
@@ -118,32 +117,36 @@ final class ImagesListService {
                 }
                 completion(.success(()))
             case .failure(let error):
-                print("Error in changeLike: \(error)")
+                print("Error in changeLike: NetworkError - \(error)")
                 completion(.failure(error))
+            }
+            
+            DispatchQueue.main.async {
+                self?.task = nil
             }
         }
         
         self.task = task
         task.resume()
     }
-
+    
     private func makePhotoRequest(page: Int, perPage: Int) -> URLRequest? {
         guard let token = OAuth2TokenStorage.shared.token else {
-            print("Ошибка при создании запроса: отсутствует токен")
+            print("[fetchPhotosNextPage] the Token is missing")
             return nil
         }
-
+        
         var urlComponents = URLComponents(url: Constants.photosURL, resolvingAgainstBaseURL: false)
         urlComponents?.queryItems = [
             URLQueryItem(name: "page", value: "\(page)"),
             URLQueryItem(name: "per_page", value: "\(perPage)")
         ]
-
+        
         guard let url = urlComponents?.url else {
-            print("Не удалось сформировать URL")
+            print("[fetchPhotosNextPage] Couldn't generate URL")
             return nil
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -152,7 +155,7 @@ final class ImagesListService {
     
     private func makeLikeRequest(photoId: String, isLike: Bool) -> URLRequest? {
         guard let token = OAuth2TokenStorage.shared.token else {
-            print("Ошибка при создании запроса: отсутствует токен")
+            print("[makeLikeRequest] the Token is missing")
             return nil
         }
         

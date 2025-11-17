@@ -23,25 +23,13 @@ final class ImagesListViewController: UIViewController {
     }()
     
     private var imagesListServiceObserver: NSObjectProtocol?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-        
-        // Подписываемся на нотификации
-        imagesListServiceObserver = NotificationCenter.default
-            .addObserver(
-                forName: ImagesListService.didChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] _ in
-                guard let self = self else { return }
-                self.updateTableViewAnimated()
-            }
-        
-        // Загружаем первую страницу
-        imagesListService.fetchPhotosNextPage()
+        setupObserver()
+        fetchImages()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -61,10 +49,21 @@ final class ImagesListViewController: UIViewController {
         }
     }
     
+    // CHANGE: улучшенная настройка observer
+    private func setupObserver() {
+        imagesListServiceObserver = NotificationCenter.default.addObserver(
+            forName: ImagesListService.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            self.updateTableViewAnimated()
+        }
+    }
+    
     private func updateTableViewAnimated() {
         let oldCount = photos.count
         let newCount = imagesListService.photos.count
-        
         photos = imagesListService.photos
         
         if oldCount != newCount {
@@ -72,6 +71,20 @@ final class ImagesListViewController: UIViewController {
                 let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
                 tableView.insertRows(at: indexPaths, with: .automatic)
             } completion: { _ in }
+        }
+    }
+    
+    // CHANGE: переименовал и добавил обработку ошибок
+    private func fetchImages() {
+        imagesListService.fetchPhotosNextPage() { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    break // Обновление через нотификации
+                case .failure(let error):
+                    print("Ошибка загрузки фото: \(error)")
+                }
+            }
         }
     }
 }
@@ -105,6 +118,7 @@ extension ImagesListViewController {
         
         // Загружаем изображение с заглушкой
         if let url = URL(string: photo.thumbImageURL) {
+            cell.cellImage.kf.indicatorType = .activity
             cell.cellImage.kf.setImage(
                 with: url,
                 placeholder: UIImage(named: "stub")
@@ -142,7 +156,7 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         // Загружаем следующую страницу когда подходим к концу
         if indexPath.row + 1 == photos.count {
-            imagesListService.fetchPhotosNextPage()
+            fetchImages()
         }
     }
 }
@@ -155,18 +169,18 @@ extension ImagesListViewController: ImagesListCellDelegate {
         
         UIBlockingProgressHUD.show()
         
-        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
             DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
                 
                 switch result {
                 case .success:
-                    if let index = self?.photos.firstIndex(where: { $0.id == photo.id }) {
-                        self?.photos[index].isLiked = !photo.isLiked
+                    if let index = self.photos.firstIndex(where: { $0.id == photo.id }) {
+                        self.photos[index].isLiked = !photo.isLiked
                         cell.setIsLiked(!photo.isLiked)
                     }
-                case .failure(let error):
-                    print("Ошибка при изменении лайка: \(error)")
+                case .failure:
+                    break // Ошибка уже залогирована в сервисе
                 }
             }
         }
