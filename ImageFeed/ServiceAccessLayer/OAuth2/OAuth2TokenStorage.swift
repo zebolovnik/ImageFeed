@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftKeychainWrapper
 
 final class OAuth2TokenStorage {
     // ADDED: синглтон
@@ -16,10 +17,16 @@ final class OAuth2TokenStorage {
     
     var token: String? {
         get {
-            UserDefaults.standard.string(forKey: key)
+            // CHANGE: заменили UserDefaults на KeychainWrapper
+            return KeychainWrapper.standard.string(forKey: key)
         }
         set {
-            UserDefaults.standard.set(newValue, forKey: key)
+            // CHANGE: заменили UserDefaults на KeychainWrapper
+            if let token = newValue {
+                KeychainWrapper.standard.set(token, forKey: key)
+            } else {
+                KeychainWrapper.standard.removeObject(forKey: key)
+            }
         }
     }
 }
