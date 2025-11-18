@@ -1,19 +1,10 @@
-//
-//  ImagesListService.swift
-//  ImageFeed
-//
-//  Created by Nikolay Zebolov on 18.11.2025.
-//
-
 import Foundation
 
 final class ImagesListService {
     static let shared = ImagesListService()
     private init() {}
     
-    static let didChangeNotification = Notification.Name(
-        rawValue: "ImagesListServiceDidChange"
-    )
+    static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
     
     private var lastLoadedPage: Int?
     private var task: URLSessionTask?
@@ -24,7 +15,7 @@ final class ImagesListService {
     
     func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
         guard task == nil else {
-            print("[fetchPhotosNextPage] the page is still loading")
+            print("[fetchPhotosNextPage] the page is still loading") // NOTE: для продакшена лучше использовать логгер
             return
         }
         
@@ -62,15 +53,13 @@ final class ImagesListService {
                     photos.append(photo)
                 }
                 
-                DispatchQueue.main.async {
-                    self?.photos.append(contentsOf: photos)
-                    self?.lastLoadedPage = nextPage
-                    NotificationCenter.default.post(
-                        name: ImagesListService.didChangeNotification,
-                        object: self
-                    )
-                    completion(.success(photos))
-                }
+                self?.photos.append(contentsOf: photos)
+                self?.lastLoadedPage = nextPage
+                NotificationCenter.default.post(
+                    name: ImagesListService.didChangeNotification,
+                    object: self
+                )
+                completion(.success(photos))
                 
             case .failure(let error):
                 print("[fetchPhotosNextPage] Download error: \(error.localizedDescription)")
@@ -103,16 +92,8 @@ final class ImagesListService {
             case .success:
                 if let index = self?.photos.firstIndex(where: { $0.id == photoId }) {
                     let photo = self!.photos[index]
-                    let newPhoto = Photo(
-                        id: photo.id,
-                        size: photo.size,
-                        createdAt: photo.createdAt,
-                        welcomeDescription: photo.welcomeDescription,
-                        thumbImageURL: photo.thumbImageURL,
-                        largeImageURL: photo.largeImageURL,
-                        fullImageURL: photo.fullImageURL,
-                        isLiked: !photo.isLiked
-                    )
+                    // CHANGE: используем метод withLiked вместо создания новой структуры
+                    let newPhoto = photo.withLiked(!photo.isLiked)
                     self?.photos[index] = newPhoto
                 }
                 completion(.success(()))
@@ -148,7 +129,7 @@ final class ImagesListService {
         }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        request.httpMethod = HTTPMethod.get.rawValue // CHANGE: используем enum
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
     }
@@ -161,7 +142,8 @@ final class ImagesListService {
         
         let likeURL = Constants.photosURL.appendingPathComponent("\(photoId)/like")
         var request = URLRequest(url: likeURL)
-        request.httpMethod = isLike ? "POST" : "DELETE"
+        // CHANGE: используем enum для HTTP методов
+        request.httpMethod = isLike ? HTTPMethod.post.rawValue : HTTPMethod.delete.rawValue
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
     }

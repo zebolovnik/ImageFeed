@@ -176,7 +176,8 @@ extension ImagesListViewController: ImagesListCellDelegate {
                 switch result {
                 case .success:
                     if let index = self.photos.firstIndex(where: { $0.id == photo.id }) {
-                        self.photos[index].isLiked = !photo.isLiked
+                        let updatedPhoto = self.photos[index].withLiked(!photo.isLiked)
+                        self.photos[index] = updatedPhoto
                         cell.setIsLiked(!photo.isLiked)
                     }
                 case .failure:

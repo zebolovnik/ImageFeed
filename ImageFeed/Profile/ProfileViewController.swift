@@ -65,7 +65,7 @@ final class ProfileViewController: UIViewController {
         )
         let noAction = UIAlertAction(title: "Нет", style: .default)
         let yesAction = UIAlertAction(title: "Да", style: .default) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             self.profileLogoutService.logout()
             self.switchToSplashScreen()
         }

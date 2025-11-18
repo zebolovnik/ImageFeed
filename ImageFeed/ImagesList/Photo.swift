@@ -15,7 +15,21 @@ struct Photo {
     let thumbImageURL: String
     let largeImageURL: String
     let fullImageURL: String
-    var isLiked: Bool
+    let isLiked: Bool // CHANGE: сделал константой
+    
+    // ADDED: метод для создания новой структуры с измененным лайком
+    func withLiked(_ isLiked: Bool) -> Photo {
+        Photo(
+            id: id,
+            size: size,
+            createdAt: createdAt,
+            welcomeDescription: welcomeDescription,
+            thumbImageURL: thumbImageURL,
+            largeImageURL: largeImageURL,
+            fullImageURL: fullImageURL,
+            isLiked: isLiked
+        )
+    }
 }
 
 struct PhotoResult: Decodable {
