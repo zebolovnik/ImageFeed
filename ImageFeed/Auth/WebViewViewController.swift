@@ -21,6 +21,7 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
     override func viewDidLoad() {
         super.viewDidLoad()
         webView.navigationDelegate = self
+        webView.accessibilityIdentifier = "UnsplashWebView"
         presenter?.viewDidLoad()
     }
     
@@ -37,6 +38,7 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
                  guard let self = self else { return }
                  presenter?.didUpdateProgressValue(webView.estimatedProgress)
              })
+        print("WebView accessibility identifier: \(webView.accessibilityIdentifier ?? "not set")")
     }
     
     // WebViewViewControllerProtocol методы:

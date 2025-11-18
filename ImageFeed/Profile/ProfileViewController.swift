@@ -147,17 +147,20 @@ private extension ProfileViewController {
         nameLabel.textColor = UIColor(named: "YP White")
         nameLabel.font = UIFont.boldSystemFont(ofSize: 23)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.accessibilityIdentifier = "profile name"
         
         loginNameLabel.text = ""
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13)
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        loginNameLabel.accessibilityIdentifier = "profile login"
         
         descriptionLabel.text = ""
         descriptionLabel.textColor = UIColor(named: "YP White")
         descriptionLabel.font = UIFont.systemFont(ofSize: 13)
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.numberOfLines = 0
+        descriptionLabel.accessibilityIdentifier = "profile bio"
         
         [nameLabel, loginNameLabel, descriptionLabel].forEach { view.addSubview($0) }
         
@@ -178,6 +181,7 @@ private extension ProfileViewController {
         logoutButton.tintColor = UIColor(named: "YP Red")
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
         logoutButton.addTarget(self, action: #selector(didTapLogoutButton), for: .touchUpInside)
+        logoutButton.accessibilityIdentifier = "logout button"
         view.addSubview(logoutButton)
         
         NSLayoutConstraint.activate([

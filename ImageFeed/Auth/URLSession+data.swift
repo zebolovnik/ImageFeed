@@ -66,8 +66,6 @@ extension URLSession {
                 
                 do {
                     let decoder = JSONDecoder()
-                    // CHANGE: убрана стратегия convertFromSnakeCase
-                    // Поля уже маппятся через CodingKeys в структурах
                     
                     let decodedObject = try decoder.decode(T.self, from: data)
                     print("[objectTask] ✅ Decoding successful")

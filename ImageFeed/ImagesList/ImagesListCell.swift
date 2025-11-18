@@ -43,7 +43,6 @@ final class ImagesListCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        // Отменяем загрузку изображения при переиспользовании ячейки
         cellImage.kf.cancelDownloadTask()
     }
     
@@ -54,5 +53,7 @@ final class ImagesListCell: UITableViewCell {
     func setIsLiked(_ isLiked: Bool) {
         let imageName = isLiked ? "like_button_on" : "like_button_off"
         likeButton.setImage(UIImage(named: imageName), for: .normal)
+        // ADDED: accessibility identifiers для UI-тестов
+        likeButton.accessibilityIdentifier = isLiked ? "like button on" : "like button off"
     }
 }

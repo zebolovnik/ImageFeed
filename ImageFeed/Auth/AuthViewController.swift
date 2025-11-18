@@ -63,9 +63,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
             case .success(let token):
                 print("Получен токен: \(token)")
                 DispatchQueue.main.async {
-                    // Сначала сообщаем делегату об успешной авторизации
                     self.delegate?.didAuthenticate(self)
-                    // Затем закрываем WebView
                     vc.dismiss(animated: true)
                 }
             case .failure(let error):

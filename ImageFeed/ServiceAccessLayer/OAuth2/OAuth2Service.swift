@@ -45,12 +45,10 @@ final class OAuth2Service {
             return
         }
         
-        // ADDED: логирование запроса
         print("[fetchAuthToken] Making OAuth request with code:", code.prefix(10) + "...")
         print("[fetchAuthToken] Request URL:", request.url?.absoluteString ?? "nil")
         
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
-            // ADDED: детальное логирование результата
             print("[fetchAuthToken] OAuth result received")
             
             DispatchQueue.main.async {
@@ -64,7 +62,6 @@ final class OAuth2Service {
                 print("✅ Full token length:", responseBody.accessToken.count)
                 self?.tokenStorage.token = responseBody.accessToken
                 
-                // ADDED: проверка сохранения токена
                 if let savedToken = self?.tokenStorage.token {
                     print("✅ Token saved successfully:", savedToken.prefix(10) + "...")
                 } else {
@@ -78,7 +75,6 @@ final class OAuth2Service {
                 print("❌ OAuth FAILED - Error:", error)
                 print("❌ Error type:", type(of: error))
                 
-                // ADDED: дополнительная информация для NetworkError
                 if let networkError = error as? NetworkError {
                     switch networkError {
                     case .httpStatusCode(let code):

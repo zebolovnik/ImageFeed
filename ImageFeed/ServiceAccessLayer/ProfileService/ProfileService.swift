@@ -44,7 +44,6 @@ final class ProfileService {
             return
         }
         
-        // CHANGE: использование objectTask вместо data
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
             switch result {
             case .success(let profileResult):
@@ -57,7 +56,6 @@ final class ProfileService {
                 self?.profile = profile
                 completion(.success(profile))
             case .failure(let error):
-                // ADDED: логирование ошибок
                 print("[fetchProfile]: Ошибка - \(error.localizedDescription)")
                 completion(.failure(error))
             }

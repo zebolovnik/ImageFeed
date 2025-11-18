@@ -21,8 +21,8 @@ final class SingleImageViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        imageView.accessibilityIdentifier = "SingleImageView"
         
-        // Отключаем влияние safe area на scrollView
         scrollView.contentInsetAdjustmentBehavior = .never
         
         scrollView.minimumZoomScale = 0.1
@@ -35,7 +35,6 @@ final class SingleImageViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        // Повторное центрирование после окончательной верстки
         if let image = imageView.image {
             rescaleAndCenterImageInScrollView(image: image)
         }
@@ -102,14 +101,12 @@ final class SingleImageViewController: UIViewController {
             return
         }
         
-        // Масштабируем, чтобы изображение заполняло экран (а не умещалось)
         let hScale = visibleRectSize.width / imageSize.width
         let vScale = visibleRectSize.height / imageSize.height
         let scale = min(maxZoomScale, max(minZoomScale, max(hScale, vScale)))
         scrollView.setZoomScale(scale, animated: false)
         scrollView.layoutIfNeeded()
         
-        // Центрируем картинку по горизонтали и вертикали
         let newContentSize = scrollView.contentSize
         let x = max(0, (newContentSize.width - visibleRectSize.width) / 2)
         let y = max(0, (newContentSize.height - visibleRectSize.height) / 2)
