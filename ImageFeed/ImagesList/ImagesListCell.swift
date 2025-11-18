@@ -6,24 +6,24 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ImagesListCell: UITableViewCell {
     static let reuseIdentifier = "ImagesListCell"
     
-    @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var likeButton: UIButton!
     @IBOutlet weak var cellImage: UIImageView!
+    @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var gradientView: UIView!
+    
+    weak var delegate: ImagesListCellDelegate?
     
     private let gradientLayer = CAGradientLayer()
     
-    func setIsLiked(_ isLiked: Bool) {
-        let imageName = isLiked ? "like_button_on" : "like_button_off"
-        likeButton.setImage(UIImage(named: imageName), for: .normal)
-    }
-    
     override func awakeFromNib() {
         super.awakeFromNib()
+        
+        // Настройка градиента
         gradientLayer.colors = [
             UIColor.clear.cgColor,
             UIColor(named: "YP Black")!.withAlphaComponent(0.4).cgColor
@@ -31,6 +31,9 @@ final class ImagesListCell: UITableViewCell {
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0)
         gradientLayer.endPoint = CGPoint(x: 0.5, y: 1)
         gradientView.layer.insertSublayer(gradientLayer, at: 0)
+        
+        // Добавляем индикатор загрузки
+        cellImage.kf.indicatorType = .activity
     }
     
     override func layoutSubviews() {
@@ -38,4 +41,18 @@ final class ImagesListCell: UITableViewCell {
         gradientLayer.frame = gradientView.bounds
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        // Отменяем загрузку изображения при переиспользовании ячейки
+        cellImage.kf.cancelDownloadTask()
+    }
+    
+    @IBAction private func likeButtonClicked() {
+        delegate?.imageListCellDidTapLike(self)
+    }
+    
+    func setIsLiked(_ isLiked: Bool) {
+        let imageName = isLiked ? "like_button_on" : "like_button_off"
+        likeButton.setImage(UIImage(named: imageName), for: .normal)
+    }
 }
