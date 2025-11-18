@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 final class ProfileViewPresenter: ProfileViewPresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
@@ -36,5 +37,19 @@ final class ProfileViewPresenter: ProfileViewPresenterProtocol {
     
     func logout() {
         profileLogoutService.logout()
+        switchToSplashScreen()
+    }
+    
+    private func switchToSplashScreen() {
+        DispatchQueue.main.async {
+            guard let window = UIApplication.shared.windows.first else {
+                assertionFailure("Invalid window configuration")
+                return
+            }
+            
+            let splashViewController = SplashViewController()
+            window.rootViewController = splashViewController
+            window.makeKeyAndVisible()
+        }
     }
 }
