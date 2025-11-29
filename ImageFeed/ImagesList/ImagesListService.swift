@@ -92,7 +92,6 @@ final class ImagesListService {
             case .success:
                 if let index = self?.photos.firstIndex(where: { $0.id == photoId }) {
                     let photo = self!.photos[index]
-                    // CHANGE: используем метод withLiked вместо создания новой структуры
                     let newPhoto = photo.withLiked(!photo.isLiked)
                     self?.photos[index] = newPhoto
                 }
@@ -129,7 +128,7 @@ final class ImagesListService {
         }
         
         var request = URLRequest(url: url)
-        request.httpMethod = HTTPMethod.get.rawValue // CHANGE: используем enum
+        request.httpMethod = HTTPMethod.get.rawValue
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
     }
@@ -142,7 +141,6 @@ final class ImagesListService {
         
         let likeURL = Constants.photosURL.appendingPathComponent("\(photoId)/like")
         var request = URLRequest(url: likeURL)
-        // CHANGE: используем enum для HTTP методов
         request.httpMethod = isLike ? HTTPMethod.post.rawValue : HTTPMethod.delete.rawValue
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request

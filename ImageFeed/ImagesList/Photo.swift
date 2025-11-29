@@ -15,9 +15,8 @@ struct Photo {
     let thumbImageURL: String
     let largeImageURL: String
     let fullImageURL: String
-    let isLiked: Bool // CHANGE: сделал константой
+    let isLiked: Bool
     
-    // ADDED: метод для создания новой структуры с измененным лайком
     func withLiked(_ isLiked: Bool) -> Photo {
         Photo(
             id: id,

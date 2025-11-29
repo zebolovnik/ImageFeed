@@ -8,7 +8,15 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
+    var presenter: ProfileViewPresenterProtocol?
+    
+    // ADDED: метод для тестирования
+    func configure(_ presenter: ProfileViewPresenterProtocol) {
+        self.presenter = presenter
+        presenter.view = self
+    }
+    
     private enum Constants {
         static let avatarSize: CGFloat = 70
         static let avatarCornerRadius: CGFloat = 35
@@ -28,7 +36,6 @@ final class ProfileViewController: UIViewController {
     private let logoutButton = UIButton()
     
     private var profileImageServiceObserver: NSObjectProtocol?
-    private let profileLogoutService = ProfileLogoutService.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,8 +45,6 @@ final class ProfileViewController: UIViewController {
         setupLabels()
         setupLogoutButton()
         
-        updateUIFromProfile()
-        
         profileImageServiceObserver = NotificationCenter.default
             .addObserver(
                 forName: ProfileImageService.didChangeNotification,
@@ -47,17 +52,46 @@ final class ProfileViewController: UIViewController {
                 queue: .main
             ) { [weak self] _ in
                 guard let self = self else { return }
-                self.updateAvatar()
+                self.presenter?.updateAvatar()
             }
         
-        updateAvatar()
+        presenter?.viewDidLoad()
     }
     
-    @objc private func didTapLogoutButton() {
-        showExitAlert()
+    // MARK: - ProfileViewControllerProtocol
+    func updateProfile(profile: Profile) {
+        nameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
     }
     
-    private func showExitAlert() {
+    func updateAvatar(with url: URL) {
+        let processor = ResizingImageProcessor(
+            referenceSize: CGSize(width: Constants.avatarSize, height: Constants.avatarSize)
+        ).append(
+            another: RoundCornerImageProcessor(cornerRadius: Constants.avatarSize / 2)
+        )
+        
+        avatarImageView.kf.indicatorType = .activity
+        avatarImageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "stub"),
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .transition(.fade(0.2)),
+                .cacheOriginalImage
+            ]) { result in
+                switch result {
+                case .success(let value):
+                    print("✅ Avatar loaded from:", value.cacheType)
+                case .failure(let error):
+                    print("❌ Avatar load failed:", error)
+                }
+            }
+    }
+    
+    func showExitAllert() {
         let alert = UIAlertController(
             title: "Пока, пока!",
             message: "Уверены, что хотите выйти?",
@@ -66,12 +100,16 @@ final class ProfileViewController: UIViewController {
         let noAction = UIAlertAction(title: "Нет", style: .default)
         let yesAction = UIAlertAction(title: "Да", style: .default) { [weak self] _ in
             guard let self else { return }
-            self.profileLogoutService.logout()
-            self.switchToSplashScreen()
+            self.presenter?.logout()
         }
         alert.addAction(noAction)
         alert.addAction(yesAction)
         present(alert, animated: true)
+    }
+    
+    // MARK: - Private methods
+    @objc private func didTapLogoutButton() {
+        presenter?.didTapLogoutButton()
     }
     
     private func switchToSplashScreen() {
@@ -109,17 +147,20 @@ private extension ProfileViewController {
         nameLabel.textColor = UIColor(named: "YP White")
         nameLabel.font = UIFont.boldSystemFont(ofSize: 23)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.accessibilityIdentifier = "profile name"
         
         loginNameLabel.text = ""
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13)
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        loginNameLabel.accessibilityIdentifier = "profile login"
         
         descriptionLabel.text = ""
         descriptionLabel.textColor = UIColor(named: "YP White")
         descriptionLabel.font = UIFont.systemFont(ofSize: 13)
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.numberOfLines = 0
+        descriptionLabel.accessibilityIdentifier = "profile bio"
         
         [nameLabel, loginNameLabel, descriptionLabel].forEach { view.addSubview($0) }
         
@@ -140,50 +181,12 @@ private extension ProfileViewController {
         logoutButton.tintColor = UIColor(named: "YP Red")
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
         logoutButton.addTarget(self, action: #selector(didTapLogoutButton), for: .touchUpInside)
+        logoutButton.accessibilityIdentifier = "logout button"
         view.addSubview(logoutButton)
         
         NSLayoutConstraint.activate([
             logoutButton.centerYAnchor.constraint(equalTo: avatarImageView.centerYAnchor),
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: Constants.logoutTrailing)
         ])
-    }
-    
-    func updateUIFromProfile() {
-        guard let profile = ProfileService.shared.profile else { return }
-        
-        nameLabel.text = profile.name
-        loginNameLabel.text = profile.loginName
-        descriptionLabel.text = profile.bio
-    }
-    
-    private func updateAvatar() {
-        guard
-            let profileImageURL = ProfileImageService.shared.avatarURL,
-            let imageUrl = URL(string: profileImageURL)
-        else { return }
-        
-        let processor = ResizingImageProcessor(
-            referenceSize: CGSize(width: Constants.avatarSize, height: Constants.avatarSize)
-        ).append(
-            another: RoundCornerImageProcessor(cornerRadius: Constants.avatarSize / 2)
-        )
-        
-        avatarImageView.kf.indicatorType = .activity
-        avatarImageView.kf.setImage(
-            with: imageUrl,
-            placeholder: UIImage(named: "stub"),
-            options: [
-                .processor(processor),
-                .scaleFactor(UIScreen.main.scale),
-                .transition(.fade(0.2)),
-                .cacheOriginalImage
-            ]) { result in
-                switch result {
-                case .success(let value):
-                    print("✅ Avatar loaded from:", value.cacheType)
-                case .failure(let error):
-                    print("❌ Avatar load failed:", error)
-                }
-            }
     }
 }

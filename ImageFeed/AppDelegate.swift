@@ -12,7 +12,6 @@ import ProgressHUD
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // ADDED: конфигурация ProgressHUD
         configProgressHUD()
         return true
     }
@@ -31,7 +30,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
     }
     
-    // ADDED: конфигурация ProgressHUD
     private func configProgressHUD() {
         ProgressHUD.animationType = .activityIndicator
         ProgressHUD.colorHUD = .white

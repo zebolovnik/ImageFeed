@@ -1,0 +1,22 @@
+//
+//  WebViewViewControllerSpy.swift
+//  ImageFeed
+//
+//  Created by Nikolay Zebolov on 18.11.2025.
+//
+
+import Foundation
+@testable import ImageFeed
+
+final class WebViewViewControllerSpy: WebViewViewControllerProtocol {
+    var presenter: WebViewPresenterProtocol?
+    var loadRequestCalled: Bool = false
+    
+    func load(request: URLRequest) {
+        loadRequestCalled = true
+    }
+    
+    func setProgressValue(_ newValue: Float) {}
+    
+    func setProgressHidden(_ isHidden: Bool) {}
+}

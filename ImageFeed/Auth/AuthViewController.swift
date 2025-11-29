@@ -32,6 +32,9 @@ final class AuthViewController: UIViewController {
                 assertionFailure("Failed to prepare for \(showWebViewSegueIdentifier)")
                 return
             }
+            let webViewPresenter = WebViewPresenter(authHelper: AuthHelper())
+            webViewViewController.presenter = webViewPresenter
+            webViewPresenter.view = webViewViewController
             webViewViewController.delegate = self
         } else {
             super.prepare(for: segue, sender: sender)
@@ -60,9 +63,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
             case .success(let token):
                 print("Получен токен: \(token)")
                 DispatchQueue.main.async {
-                    // Сначала сообщаем делегату об успешной авторизации
                     self.delegate?.didAuthenticate(self)
-                    // Затем закрываем WebView
                     vc.dismiss(animated: true)
                 }
             case .failure(let error):

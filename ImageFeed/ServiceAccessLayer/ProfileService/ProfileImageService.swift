@@ -38,7 +38,6 @@ final class ProfileImageService {
                 self.avatarURL = userResult.profileImage.medium
                 completion(.success(userResult.profileImage.medium))
                 
-                // CHANGE: принудительно отправляем нотификацию
                 NotificationCenter.default
                     .post(
                         name: ProfileImageService.didChangeNotification,
